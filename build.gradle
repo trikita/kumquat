@@ -49,18 +49,23 @@ repositories {
 }
 
 dependencies {
+    compile 'com.android.support:recyclerview-v7:+'
+
     compile 'com.github.trikita:jedux:-SNAPSHOT'
+    compile 'co.trikita:anvil-sdk15:0.3.5'
 
     compile 'com.github.trikita:anvil-recyclerview:-SNAPSHOT'
-    compile 'co.trikita:anvil-support-v4:0.3.5'
+    //compile 'co.trikita:anvil-support-v4:0.3.5'
     compile 'co.trikita:anvil-cardview-v7:0.3.5'
-    compile 'co.trikita:anvil-appcompat-v7:0.3.5'
+    //compile 'co.trikita:anvil-appcompat-v7:0.3.5'
 
     compile 'com.github.andrewoma.dexx:collection:0.6'
     compile 'org.immutables:gson:2.1.14'
     apt 'org.immutables:value:2.1.14'
     provided 'org.immutables:value:2.1.14'
 
-    compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.0.2'
+    compile ('org.eclipse.paho:org.eclipse.paho.android.service:1.0.2') {
+        exclude module: 'support-v4'
+    }
 }
 
