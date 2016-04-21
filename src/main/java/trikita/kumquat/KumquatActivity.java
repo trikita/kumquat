@@ -8,5 +8,6 @@ public class KumquatActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(new ListLayout(this));
     }
 }
