@@ -7,15 +7,15 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import trikita.anvil.recyclerview.Recycler;
+import trikita.anvil.design.DesignDSL;
 import trikita.anvil.RenderableRecyclerViewAdapter;
 import trikita.anvil.cardview.v7.CardViewv7DSL;
 
 import trikita.anvil.RenderableView;
 import static trikita.anvil.DSL.*;
 
+import trikita.anvil.recyclerview.v7.RecyclerViewv7DSL;
 import trikita.kumquat.State.ConnectionStatus;
-import trikita.kumquat.State.MqttServer;
 
 public class ListLayout extends RenderableView {
 
@@ -26,11 +26,20 @@ public class ListLayout extends RenderableView {
     }
 
     public void view() {
-        Recycler.view(() -> {
-            Recycler.hasFixedSize(false);
-            Recycler.layoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-            Recycler.itemAnimator(new DefaultItemAnimator());
-            Recycler.adapter(mAdapter);
+        RecyclerViewv7DSL.recyclerView(() -> {
+            RecyclerViewv7DSL.layoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+            RecyclerViewv7DSL.hasFixedSize(true);
+            RecyclerViewv7DSL.itemAnimator(new DefaultItemAnimator());
+            RecyclerViewv7DSL.adapter(mAdapter);
+        });
+        DesignDSL.floatingActionButton(() -> {
+            size(WRAP, WRAP);
+            margin(dip(32));
+            DesignDSL.compatElevation(dip(4));
+            layoutGravity(BOTTOM | END);
+            onClick(v -> {
+                System.out.println("fab clicked");
+            });
         });
     }
 
@@ -45,10 +54,11 @@ public class ListLayout extends RenderableView {
 			int pos = holder.getAdapterPosition();
             CardViewv7DSL.cardView(() -> {
                 size(FILL, WRAP);
+                margin(dip(8));
 
                 linearLayout(() -> {
-                    size(0, WRAP);
-                    weight(1);
+                    size(FILL, WRAP);
+                    margin(dip(12));
                     orientation(LinearLayout.VERTICAL);
 
                     textView(() -> {
