@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0'
+        classpath 'com.android.tools.build:gradle:2.1.0'
         classpath 'me.tatarka:gradle-retrolambda:3.2.3'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.6'
     }
@@ -56,7 +56,7 @@ dependencies {
     compile 'com.android.support:design:23.3.0'
 
     compile 'com.github.trikita:jedux:-SNAPSHOT'
-    compile 'co.trikita:anvil-sdk15:0.3.5'
+    compile 'co.trikita:anvil-sdk15:0.3.6'
 
     compile 'co.trikita:anvil-support-v4:0.3.6'
     compile 'co.trikita:anvil-recyclerview-v7:0.3.6'

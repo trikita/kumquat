@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Kumquat</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
 </resources>
