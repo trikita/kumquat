@@ -54,14 +54,7 @@ public class KumquatActivity extends AppCompatActivity {
             drawerLayout(() -> {
                 init(() -> {
                     drawer = Anvil.currentView();
-                    drawerToggle = new ActionBarDrawerToggle(activity, drawer, R.string.drawer_open, R.string.drawer_close) {
-                        public void onDrawerClosed(View view) {
-                            super.onDrawerClosed(view);
-                        }
-                        public void onDrawerOpened(View drawerView) {
-                            super.onDrawerOpened(drawerView);
-                        }
-                    };
+                    drawerToggle = new ActionBarDrawerToggle(activity, drawer, R.string.drawer_open, R.string.drawer_close);
                     drawer.addDrawerListener(drawerToggle);
                     activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                     activity.getSupportActionBar().setHomeButtonEnabled(true);
@@ -78,7 +71,7 @@ public class KumquatActivity extends AppCompatActivity {
                     backgroundColor(Color.WHITE);
                     onItemClick((av, v, pos, id) -> {
                         State.Navigation nav = State.Navigation.values()[pos];
-                        App.dispatch(new Action<>(Actions.Navigation.NAVIGATE, nav));
+                        post(() -> App.dispatch(new Action<>(Actions.Navigation.NAVIGATE, nav)));
                         drawer.closeDrawer(av);
                     });
                 });
