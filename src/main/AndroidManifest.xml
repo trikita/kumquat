@@ -20,6 +20,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ConnectionEditorActivity" />
+        <activity android:name=".CardEditorActivity" />
+
         <service android:name="org.eclipse.paho.android.service.MqttService" />
     </application>
 </manifest>

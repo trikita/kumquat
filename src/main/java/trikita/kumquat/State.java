@@ -24,7 +24,7 @@ public abstract class State {
     public enum Navigation {
         CONNECTIONS(ConnectionsScreen.class, R.string.nav_connections),
         CARDS(CardsScreen.class, R.string.nav_cards),
-        FAVOURITES(FavouritesScreen.class, R.string.nav_favourites),;
+        FAVOURITES(FavouritesScreen.class, R.string.nav_favourites);
 
         public final Class<? extends View> viewClass;
         public final int nameResource;
@@ -58,7 +58,14 @@ public abstract class State {
         abstract ConnectionStatus status();
     }
 
+    @Value.Immutable
+    @Gson.TypeAdapters
+    public static abstract class Card {
+    }
+
     abstract List<MqttServer> connections();
+    abstract List<Card> cards();
+    abstract List<Card> favourites();
     abstract Navigation screen();
 
     MqttServer getConnection(String id) {
@@ -79,6 +86,14 @@ public abstract class State {
                         .clientId(DEFAULT_CLIENT_ID)
                         .status(ConnectionStatus.DISCONNECTED)
                         .build()))
+            .cards(IndexedLists.of(
+                    ImmutableCard.builder().build(),
+                    ImmutableCard.builder().build(),
+                    ImmutableCard.builder().build()
+                    ))
+            .favourites(IndexedLists.of(
+                    ImmutableCard.builder().build()
+            ))
             .screen(Navigation.CONNECTIONS)
             .build();
     }
@@ -132,4 +147,5 @@ public abstract class State {
             return IndexedLists.copyOf(list).set(index, ImmutableMqttServer.copyOf(list.get(index)).withStatus(status));
         }
     }
+
 }

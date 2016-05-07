@@ -7,7 +7,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.util.Arrays;
 
@@ -61,6 +60,7 @@ public class KumquatActivity extends AppCompatActivity {
                     drawerToggle.syncState();
                 });
                 size(FILL, FILL);
+                System.out.println("screen = " + App.state().screen().viewClass);
                 v(App.state().screen().viewClass, () -> {
                     size(FILL, FILL);
                 });
@@ -70,9 +70,9 @@ public class KumquatActivity extends AppCompatActivity {
                     adapter(navAdapter);
                     backgroundColor(Color.WHITE);
                     onItemClick((av, v, pos, id) -> {
+                        drawer.closeDrawer(av);
                         State.Navigation nav = State.Navigation.values()[pos];
                         post(() -> App.dispatch(new Action<>(Actions.Navigation.NAVIGATE, nav)));
-                        drawer.closeDrawer(av);
                     });
                 });
             });

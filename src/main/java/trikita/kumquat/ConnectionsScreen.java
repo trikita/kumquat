@@ -1,6 +1,7 @@
 package trikita.kumquat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import trikita.anvil.RenderableView;
 import trikita.anvil.cardview.v7.CardViewv7DSL;
 import trikita.anvil.design.DesignDSL;
 import trikita.anvil.recyclerview.v7.RecyclerViewv7DSL;
+import trikita.jedux.Action;
 
 import static trikita.anvil.DSL.*;
 
@@ -36,7 +38,8 @@ public class ConnectionsScreen extends RenderableView {
             DesignDSL.compatElevation(dip(4));
             layoutGravity(BOTTOM | END);
             onClick(v -> {
-                System.out.println("fab clicked");
+                Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
+                v.getContext().startActivity(intent);
             });
         });
     }
@@ -53,6 +56,11 @@ public class ConnectionsScreen extends RenderableView {
             CardViewv7DSL.cardView(() -> {
                 size(FILL, WRAP);
                 margin(dip(8));
+                onClick((v) -> {
+                    Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
+                    // TODO pass connection ID
+                    v.getContext().startActivity(intent);
+                });
 
                 linearLayout(() -> {
                     size(FILL, WRAP);
