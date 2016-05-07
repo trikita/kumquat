@@ -128,8 +128,7 @@ public abstract class State {
                         return withStatus(connections, (String) action.value, ConnectionStatus.CONNECTED);
                     case DISCONNECT:
                         return withStatus(connections, (String) action.value, ConnectionStatus.DISCONNECTED);
-                    case ADD:
-                    case EDIT:
+                    case MODIFY:
                     case REMOVE:
                 }
             }

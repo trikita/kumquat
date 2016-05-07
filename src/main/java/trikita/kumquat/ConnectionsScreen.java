@@ -2,9 +2,14 @@ package trikita.kumquat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 
 import trikita.anvil.Anvil;
@@ -26,8 +31,9 @@ public class ConnectionsScreen extends RenderableView {
     }
 
     public void view() {
+        mAdapter.notifyDataSetChanged();
         RecyclerViewv7DSL.recyclerView(() -> {
-            RecyclerViewv7DSL.layoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+            RecyclerViewv7DSL.linearLayoutManager();
             RecyclerViewv7DSL.hasFixedSize(true);
             RecyclerViewv7DSL.itemAnimator(new DefaultItemAnimator());
             RecyclerViewv7DSL.adapter(mAdapter);
@@ -44,7 +50,12 @@ public class ConnectionsScreen extends RenderableView {
         });
     }
 
-    private class ConnectionAdapter extends RenderableRecyclerViewAdapter {
+    private class ConnectionAdapter extends RenderableRecyclerViewAdapter implements ActionMode.Callback {
+
+        private final SparseBooleanArray selected = new SparseBooleanArray();
+
+        private ActionMode actionMode = null;
+
         @Override
         public int getItemCount() {
             return App.state().connections().size();
@@ -57,15 +68,34 @@ public class ConnectionsScreen extends RenderableView {
                 size(FILL, WRAP);
                 margin(dip(8));
                 onClick((v) -> {
-                    Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
-                    // TODO pass connection ID
-                    v.getContext().startActivity(intent);
+                    if (actionMode == null) {
+                        Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
+                        // TODO pass connection ID
+                        v.getContext().startActivity(intent);
+                    } else {
+                        toggleSelection(pos);
+                    }
+                });
+                onLongClick((v) -> {
+                    if (actionMode == null) {
+                        actionMode = ((AppCompatActivity) getContext()) .startSupportActionMode(this);
+                        selected.put(pos, true);
+                    } else {
+                        toggleSelection(pos);
+                    }
+                    return true;
                 });
 
                 linearLayout(() -> {
                     size(FILL, WRAP);
                     margin(dip(12));
                     orientation(LinearLayout.VERTICAL);
+
+                    textView(() -> {
+                        visibility(actionMode != null);
+                        size(WRAP, WRAP);
+                        text(selected.get(pos) ? "X" : "O");
+                    });
 
                     textView(() -> {
                         size(WRAP, WRAP);
@@ -82,6 +112,43 @@ public class ConnectionsScreen extends RenderableView {
                     });
                 });
             });
+        }
+
+        private void toggleSelection(int pos) {
+            if (selected.get(pos)) {
+                selected.delete(pos);
+                if (selected.size() == 0 && actionMode != null) {
+                    actionMode.finish();
+                    actionMode = null;
+                }
+            } else {
+                selected.put(pos, true);
+            }
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate (R.menu.multi_selector_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            // TODO: remove selected views
+            mode.finish();
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            selected.clear();
+            actionMode = null;
+            Anvil.render();
         }
     }
 }
