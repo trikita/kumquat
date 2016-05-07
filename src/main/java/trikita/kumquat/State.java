@@ -1,5 +1,7 @@
 package trikita.kumquat;
 
+import android.view.View;
+
 import java.util.UUID;
 
 import com.github.andrewoma.dexx.collection.List;
@@ -19,7 +21,21 @@ public abstract class State {
     private final static String DEFAULT_PORT = "1883";
     private final static String DEFAULT_CLIENT_ID = "kumquat-example";
 
-    public static enum ConnectionStatus {
+    public enum Navigation {
+        CONNECTIONS(ConnectionsScreen.class, R.string.nav_connections),
+        CARDS(CardsScreen.class, R.string.nav_cards),
+        FAVOURITES(FavouritesScreen.class, R.string.nav_favourites),;
+
+        public final Class<? extends View> viewClass;
+        public final int nameResource;
+
+        Navigation(Class<? extends View> viewClass, int nameResource) {
+            this.viewClass = viewClass;
+            this.nameResource = nameResource;
+        }
+    }
+
+    public enum ConnectionStatus {
         CONNECTING,
         CONNECTED,
         DISCONNECTED;
@@ -30,7 +46,7 @@ public abstract class State {
             if (status == DISCONNECTED) return "Disconnected";
             return "";
         }
-    };
+    }
 
     @Value.Immutable
     @Gson.TypeAdapters
@@ -43,6 +59,7 @@ public abstract class State {
     }
 
     abstract List<MqttServer> connections();
+    abstract Navigation screen();
 
     MqttServer getConnection(String id) {
         for (MqttServer ms : connections()) {
@@ -62,6 +79,7 @@ public abstract class State {
                         .clientId(DEFAULT_CLIENT_ID)
                         .status(ConnectionStatus.DISCONNECTED)
                         .build()))
+            .screen(Navigation.CONNECTIONS)
             .build();
     }
 
@@ -73,8 +91,16 @@ public abstract class State {
 
         public State reduce(Action action, State old) {
             return ImmutableState.builder().from(old)
-                .connections(reduceConnections(action, old.connections()))
-                .build();
+                    .connections(reduceConnections(action, old.connections()))
+                    .screen(reduceNavigation(action, old.screen()))
+                    .build();
+        }
+
+        private Navigation reduceNavigation(Action action, Navigation screen) {
+            if (action.type instanceof Actions.Navigation) {
+                return (Navigation) action.value;
+            }
+            return screen;
         }
 
         List<MqttServer> reduceConnections(Action action, List<MqttServer> connections) {

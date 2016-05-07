@@ -14,6 +14,7 @@ import java.util.Arrays;
 import trikita.anvil.Anvil;
 import trikita.anvil.RenderableAdapter;
 import trikita.anvil.RenderableView;
+import trikita.jedux.Action;
 
 import static trikita.anvil.DSL.*;
 import static trikita.anvil.support.v4.Supportv4DSL.*;
@@ -41,8 +42,7 @@ public class KumquatActivity extends AppCompatActivity {
         private DrawerLayout drawer;
         private ActionBarDrawerToggle drawerToggle;
 
-        private String[] nav = {"Connections", "Cards", "Favourites", "Settings"};
-        private RenderableAdapter navAdapter = RenderableAdapter.withItems(Arrays.asList(nav), this::navigationItemView);
+        private RenderableAdapter navAdapter = RenderableAdapter.withItems(Arrays.asList(State.Navigation.values()), this::navigationItemView);
 
         public NavigationScreen(AppCompatActivity activity) {
             super(activity);
@@ -68,11 +68,8 @@ public class KumquatActivity extends AppCompatActivity {
                     drawerToggle.syncState();
                 });
                 size(FILL, FILL);
-                frameLayout(() -> {
+                v(App.state().screen().viewClass, () -> {
                     size(FILL, FILL);
-                    textView(() -> {
-                        text("Content");
-                    });
                 });
                 listView(() -> {
                     size(dip(240), FILL);
@@ -80,17 +77,18 @@ public class KumquatActivity extends AppCompatActivity {
                     adapter(navAdapter);
                     backgroundColor(Color.WHITE);
                     onItemClick((av, v, pos, id) -> {
-                        // Handle click here
+                        State.Navigation nav = State.Navigation.values()[pos];
+                        App.dispatch(new Action<>(Actions.Navigation.NAVIGATE, nav));
                         drawer.closeDrawer(av);
                     });
                 });
             });
         }
 
-        private void navigationItemView(int index, String item) {
+        private void navigationItemView(int index, State.Navigation item) {
             textView(() -> {
                 size(FILL, dip(48));
-                text(item);
+                text(item.nameResource);
             });
         }
 
