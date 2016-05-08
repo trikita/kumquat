@@ -12,6 +12,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import trikita.anvil.Anvil;
 import trikita.anvil.RenderableRecyclerViewAdapter;
 import trikita.anvil.RenderableView;
@@ -52,7 +55,7 @@ public class ConnectionsScreen extends RenderableView {
 
     private class ConnectionAdapter extends RenderableRecyclerViewAdapter implements ActionMode.Callback {
 
-        private final SparseBooleanArray selected = new SparseBooleanArray();
+        private final Set<String> selected = new HashSet<>();
 
         private ActionMode actionMode = null;
 
@@ -64,24 +67,25 @@ public class ConnectionsScreen extends RenderableView {
         @Override
         public void view(RecyclerView.ViewHolder holder) {
             int pos = holder.getAdapterPosition();
+            String connId = App.state().connections().get(pos).id();
             CardViewv7DSL.cardView(() -> {
                 size(FILL, WRAP);
                 margin(dip(8));
                 onClick((v) -> {
                     if (actionMode == null) {
                         Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
-                        // TODO pass connection ID
+                        intent.putExtra("id", connId);
                         v.getContext().startActivity(intent);
                     } else {
-                        toggleSelection(pos);
+                        toggleSelection(connId);
                     }
                 });
                 onLongClick((v) -> {
                     if (actionMode == null) {
                         actionMode = ((AppCompatActivity) getContext()) .startSupportActionMode(this);
-                        selected.put(pos, true);
+                        selected.add(connId);
                     } else {
-                        toggleSelection(pos);
+                        toggleSelection(connId);
                     }
                     return true;
                 });
@@ -94,16 +98,12 @@ public class ConnectionsScreen extends RenderableView {
                     textView(() -> {
                         visibility(actionMode != null);
                         size(WRAP, WRAP);
-                        text(selected.get(pos) ? "X" : "O");
+                        text(selected.contains(connId) ? "X" : "O");
                     });
 
                     textView(() -> {
                         size(WRAP, WRAP);
-                        text(App.state().connections().get(pos).host()+":"+App.state().connections().get(pos).port());
-                    });
-                    textView(() -> {
-                        size(WRAP, WRAP);
-                        text(App.state().connections().get(pos).clientId());
+                        text(App.state().connections().get(pos).uri());
                     });
                     textView(() -> {
                         size(WRAP, WRAP);
@@ -114,15 +114,15 @@ public class ConnectionsScreen extends RenderableView {
             });
         }
 
-        private void toggleSelection(int pos) {
-            if (selected.get(pos)) {
-                selected.delete(pos);
+        private void toggleSelection(String id) {
+            if (selected.contains(id)) {
+                selected.remove(id);
                 if (selected.size() == 0 && actionMode != null) {
                     actionMode.finish();
                     actionMode = null;
                 }
             } else {
-                selected.put(pos, true);
+                selected.add(id);
             }
         }
 
@@ -139,7 +139,10 @@ public class ConnectionsScreen extends RenderableView {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            // TODO: remove selected views
+            for (String id : selected) {
+                App.dispatch(new Action<>(Actions.Connection.DISCONNECT, id));
+            }
+            App.dispatch(new Action<>(Actions.Connection.REMOVE, new HashSet<>(selected)));
             mode.finish();
             return true;
         }

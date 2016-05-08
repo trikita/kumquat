@@ -51,6 +51,10 @@ public class MqttController implements Store.Middleware<Action, State> {
                     break;
                 case DISCONNECT:
                     id = (String) action.value;
+                    System.out.println("disconnect " + id);
+                    System.out.println("store: " + store);
+                    System.out.println("state: " + store.getState());
+                    System.out.println("conn: " + store.getState().getConnection(id));
                     if (store.getState().getConnection(id).status() != ConnectionStatus.DISCONNECTED) {
                         disconnect(id);
                     }
@@ -61,12 +65,12 @@ public class MqttController implements Store.Middleware<Action, State> {
     }
 
     private void initClient(String id, MqttServer ms) {
-        MqttAndroidClient client = new MqttAndroidClient(mContext, ms.host()+":"+ms.port(), ms.clientId());
+        MqttAndroidClient client = new MqttAndroidClient(mContext, ms.uri(), ms.clientId());
         mClients.put(id, client);
         try {
             connect(id);
         } catch (MqttException e) {
-            Log.d(tag, "Failed to connect to "+ms.host()+":"+ms.port());
+            Log.d(tag, "Failed to connect to "+ms.uri());
             mClients.remove(id);
             e.printStackTrace();
         }

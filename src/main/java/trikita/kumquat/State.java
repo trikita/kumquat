@@ -2,6 +2,7 @@ package trikita.kumquat;
 
 import android.view.View;
 
+import java.util.Set;
 import java.util.UUID;
 
 import com.github.andrewoma.dexx.collection.List;
@@ -17,9 +18,7 @@ import trikita.jedux.Store;
 @Gson.TypeAdapters
 public abstract class State {
 
-    private final static String DEFAULT_HOST = "tcp://192.168.9.124";
-    private final static String DEFAULT_PORT = "1883";
-    private final static String DEFAULT_CLIENT_ID = "kumquat-example";
+    private final static String DEFAULT_SERVER = "tcp://192.168.9.124:1883";
 
     public enum Navigation {
         CONNECTIONS(ConnectionsScreen.class, R.string.nav_connections),
@@ -51,29 +50,44 @@ public abstract class State {
     @Value.Immutable
     @Gson.TypeAdapters
     public static abstract class MqttServer {
-        abstract String id();
-        abstract String host();
-        abstract String port();
-        abstract String clientId();
-        abstract ConnectionStatus status();
+        public abstract String id();
+        public abstract String uri();
+        public abstract String clientId();
+        // TODO: username, password
+        // TODO: SSL
+        // TODO: will topic, message, QoS, retain
+        public abstract ConnectionStatus status();
     }
 
     @Value.Immutable
     @Gson.TypeAdapters
     public static abstract class Card {
+        public abstract String id();
+        public abstract String name();
+        public abstract String topic();
+        public abstract String value();
+        // TODO: QoS, retain
+        // TODO: Card type: read-only, text, toggle, slider, push button
+        // TODO: min/max for slider cards
+        // TODO: true/false values for toggle cards
+        // TODO: value for push button cards
+        // TODO: icon and color for toggle and push button cards
     }
 
-    abstract List<MqttServer> connections();
-    abstract List<Card> cards();
-    abstract List<Card> favourites();
-    abstract Navigation screen();
+    public abstract List<MqttServer> connections();
+    public abstract List<Card> cards();
+    public abstract List<Card> favourites();
+    public abstract Navigation screen();
 
     MqttServer getConnection(String id) {
+        System.out.println("Requested connection: " + id);
         for (MqttServer ms : connections()) {
+            System.out.println("Iterating connection: " + ms.id());
             if (ms.id().equals(id)) {
                 return ms;
             }
         }
+        System.out.println("Connection not found: " + id);
         return null;
     }
     
@@ -81,19 +95,12 @@ public abstract class State {
         return ImmutableState.builder()
             .connections(IndexedLists.of(ImmutableMqttServer.builder()
                         .id(generateId())
-                        .host(DEFAULT_HOST)
-                        .port(DEFAULT_PORT)
-                        .clientId(DEFAULT_CLIENT_ID)
+                        .uri(DEFAULT_SERVER)
+                        .clientId("")
                         .status(ConnectionStatus.DISCONNECTED)
                         .build()))
-            .cards(IndexedLists.of(
-                    ImmutableCard.builder().build(),
-                    ImmutableCard.builder().build(),
-                    ImmutableCard.builder().build()
-                    ))
-            .favourites(IndexedLists.of(
-                    ImmutableCard.builder().build()
-            ))
+            .cards(IndexedLists.of())
+            .favourites(IndexedLists.of())
             .screen(Navigation.CONNECTIONS)
             .build();
     }
@@ -128,23 +135,40 @@ public abstract class State {
                         return withStatus(connections, (String) action.value, ConnectionStatus.CONNECTED);
                     case DISCONNECT:
                         return withStatus(connections, (String) action.value, ConnectionStatus.DISCONNECTED);
+                    case CREATE:
+                        return connections.append((MqttServer) action.value);
                     case MODIFY:
+                        MqttServer modifiedConn = (MqttServer) action.value;
+                        int i = indexOf(connections, modifiedConn.id());
+                        return IndexedLists.copyOf(connections).set(i, modifiedConn);
                     case REMOVE:
+                        List<MqttServer> filtered = IndexedLists.of();
+                        Set<String> removed = (Set<String>) action.value;
+                        for (MqttServer conn : connections) {
+                            if (!removed.contains(conn.id())) {
+                                filtered = filtered.append(conn);
+                            }
+                        }
+                        return filtered;
                 }
             }
             return connections;
         }
 
-        static List<MqttServer> withStatus(List<MqttServer> list, String id, ConnectionStatus status) {
+        static int indexOf(List<MqttServer> list, String id) {
             int index = 0;
             for (MqttServer ms : list) {
                 if (ms.id().equals(id)) {
-                    break;
+                    return index;
                 }
                 index++;
             }
-            return IndexedLists.copyOf(list).set(index, ImmutableMqttServer.copyOf(list.get(index)).withStatus(status));
+            return -1;
+        }
+
+        static List<MqttServer> withStatus(List<MqttServer> list, String id, ConnectionStatus status) {
+            int i = indexOf(list, id);
+            return IndexedLists.copyOf(list).set(i, ImmutableMqttServer.copyOf(list.get(i)).withStatus(status));
         }
     }
-
 }
