@@ -54,7 +54,16 @@ public class MqttController implements Store.Middleware<Action, State> {
             switch (type) {
                 case CONNECT:
                     id = (String) action.value;
-                    initClient(id, store.getState().getConnection(id));
+                    if (store.getState().getConnection(id).status() == ConnectionStatus.DISCONNECTED) {
+                        System.out.println("CONNECT " + id);
+                        System.out.println("store: " + store);
+                        System.out.println("state: " + store.getState());
+                        System.out.println("conn: " + store.getState().getConnection(id));
+                        initClient(id, store.getState().getConnection(id));
+                    } else {
+                        System.out.println("CONNECT " + id + ". Already in progress");
+                        return;
+                    }
                     break;
                 case DISCONNECT:
                     id = (String) action.value;
