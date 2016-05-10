@@ -118,6 +118,8 @@ public class MqttController implements Store.Middleware<Action, State> {
             mClients.get(id).disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
+        } finally {
+            mClients.remove(id);
         }
     }
 }
