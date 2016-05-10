@@ -99,9 +99,12 @@ public class MqttController implements Store.Middleware<Action, State> {
         client.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable e) {
-                Log.d(tag, "Connection lost");
+                Log.d(tag, "Connection lost =====================");
                 e.printStackTrace();
-                App.dispatch(new Action<>(Actions.Connection.CONNECT, connId));
+                System.out.println("Status "+connId+": "+App.state().getConnection(connId).status());
+                if (App.state().getConnection(connId).status() != ConnectionStatus.DISCONNECTED) {
+                    App.dispatch(new Action<>(Actions.Connection.CONNECT, connId));
+                }
             }
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
