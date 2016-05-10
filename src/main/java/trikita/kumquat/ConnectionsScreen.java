@@ -7,9 +7,11 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
 import java.util.HashSet;
@@ -18,12 +20,15 @@ import java.util.Set;
 import trikita.anvil.Anvil;
 import trikita.anvil.RenderableRecyclerViewAdapter;
 import trikita.anvil.RenderableView;
+import trikita.anvil.appcompat.v7.AppCompatv7DSL;
 import trikita.anvil.cardview.v7.CardViewv7DSL;
 import trikita.anvil.design.DesignDSL;
 import trikita.anvil.recyclerview.v7.RecyclerViewv7DSL;
 import trikita.jedux.Action;
 
 import static trikita.anvil.DSL.*;
+
+import trikita.kumquat.State.ConnectionStatus;
 
 public class ConnectionsScreen extends RenderableView {
 
@@ -92,23 +97,44 @@ public class ConnectionsScreen extends RenderableView {
 
                 linearLayout(() -> {
                     size(FILL, WRAP);
-                    margin(dip(12));
-                    orientation(LinearLayout.VERTICAL);
 
-                    textView(() -> {
-                        visibility(actionMode != null);
-                        size(WRAP, WRAP);
-                        text(selected.contains(connId) ? "X" : "O");
+                    linearLayout(() -> {
+                        size(0, WRAP);
+                        weight(1);
+                        margin(dip(12));
+                        orientation(LinearLayout.VERTICAL);
+
+                        textView(() -> {
+                            visibility(actionMode != null);
+                            size(WRAP, WRAP);
+                            text(selected.contains(connId) ? "X" : "O");
+                        });
+
+                        textView(() -> {
+                            size(WRAP, WRAP);
+                            text(App.state().connections().get(pos).uri());
+                        });
+                        textView(() -> {
+                            size(WRAP, WRAP);
+                            text(State.ConnectionStatus.toString(App.state().connections().get(pos).status()));
+                            allCaps(true);
+                        });
                     });
 
-                    textView(() -> {
+                    System.out.println("rendering card view at position " + pos);
+                    AppCompatv7DSL.switchCompat(() -> {
                         size(WRAP, WRAP);
-                        text(App.state().connections().get(pos).uri());
-                    });
-                    textView(() -> {
-                        size(WRAP, WRAP);
-                        text(State.ConnectionStatus.toString(App.state().connections().get(pos).status()));
-                        allCaps(true);
+                        layoutGravity(CENTER_VERTICAL);
+                        enabled(App.state().connections().get(pos).status() != ConnectionStatus.CONNECTING);
+                        onCheckedChange((CompoundButton btn, boolean check) -> {
+                            System.out.println("onCheckedChange(): "+check);
+                            if (check) {
+                                App.dispatch(new Action<>(Actions.Connection.CONNECT, connId));
+                            } else {
+                                App.dispatch(new Action<>(Actions.Connection.DISCONNECT, connId));
+                            }
+                        });
+                        checked(App.state().connections().get(pos).status() != ConnectionStatus.DISCONNECTED);
                     });
                 });
             });
