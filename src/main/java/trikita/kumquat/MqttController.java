@@ -1,6 +1,7 @@
 package trikita.kumquat;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import com.github.andrewoma.dexx.collection.List;
@@ -25,18 +26,24 @@ import trikita.kumquat.State.MqttServer;
 
 public class MqttController implements Store.Middleware<Action, State> {
     private final static String tag = "MqttController";
+    private final static long INIT_CONNECT_DELAY = 100; // 100ms
 
     private Context mContext;
     private static Map<String, MqttAndroidClient> mClients = Collections.synchronizedMap(new HashMap<>());
 
+    private Handler mHandler = new Handler();
+
     public MqttController(Context context, List<MqttServer> connections) {
         mContext = context;
 
-        String id;
-        MqttServer ms;
-        for (MqttServer conn : connections) {
-            initClient(conn.id(), conn);
-        }
+        mHandler.postDelayed(() -> {
+            String id;
+            MqttServer ms;
+            for (MqttServer conn : connections) {
+                Log.d(tag, "MQTT client init");
+                initClient(conn.id(), conn);
+            }
+        }, INIT_CONNECT_DELAY);
     }
 
     @Override
