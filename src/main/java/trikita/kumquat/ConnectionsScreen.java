@@ -39,7 +39,6 @@ public class ConnectionsScreen extends RenderableView {
     }
 
     public void view() {
-        mAdapter.notifyDataSetChanged();
         RecyclerViewv7DSL.recyclerView(() -> {
             RecyclerViewv7DSL.linearLayoutManager();
             RecyclerViewv7DSL.hasFixedSize(true);
@@ -55,6 +54,10 @@ public class ConnectionsScreen extends RenderableView {
                 Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
                 v.getContext().startActivity(intent);
             });
+        });
+        post(() -> {
+            System.out.println("notifyDataSetChanged()");
+            mAdapter.notifyDataSetChanged();
         });
     }
 
@@ -73,6 +76,7 @@ public class ConnectionsScreen extends RenderableView {
         public void view(RecyclerView.ViewHolder holder) {
             int pos = holder.getAdapterPosition();
             String connId = App.state().connections().get(pos).id();
+            System.out.println("view(): "+connId+" "+App.state().connections().get(pos).status().toString());
             CardViewv7DSL.cardView(() -> {
                 size(FILL, WRAP);
                 margin(dip(8));
