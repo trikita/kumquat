@@ -67,7 +67,7 @@ public class MqttController implements Store.Middleware<Action, State> {
                     break;
                 case DISCONNECT:
                     id = (String) action.value;
-                    System.out.println("disconnect " + id);
+                    System.out.println("DISCONNECT " + id);
                     System.out.println("store: " + store);
                     System.out.println("state: " + store.getState());
                     System.out.println("conn: " + store.getState().getConnection(id));
@@ -84,17 +84,22 @@ public class MqttController implements Store.Middleware<Action, State> {
         MqttAndroidClient client = new MqttAndroidClient(mContext, ms.uri(), ms.clientId());
         mClients.put(id, client);
         try {
+            System.out.println("Start connecting to " + id + ". Status " + ms.status().toString());
             connect(id);
         } catch (MqttException e) {
-            Log.d(tag, "Failed to connect to "+ms.uri());
+            Log.d(tag, "Failed to connect to "+ms.uri()+". Status " + ms.status().toString());
             mClients.remove(id);
             e.printStackTrace();
         }
     }
 
     private void connect(String connId) throws MqttException {
+        Log.d(tag, "connect(): "+connId);
         MqttAndroidClient client = mClients.get(connId);
-        assert client != null;
+        if (client == null) {
+            Log.d(tag, "could not create MQTT client");
+            return;
+        }
 
         client.setCallback(new MqttCallback() {
             @Override
@@ -121,6 +126,7 @@ public class MqttController implements Store.Middleware<Action, State> {
             public void onSuccess(IMqttToken asyncActionToken) {
                 Log.d(tag, "Connected successfully");
                 //subscribe();
+                System.out.println("Status "+App.state().getConnection(connId).status());
                 App.dispatch(new Action<>(Actions.Connection.CONNECTED, connId));
             }
             @Override
@@ -134,6 +140,7 @@ public class MqttController implements Store.Middleware<Action, State> {
 
     private void disconnect(String id) {
         try {
+            System.out.println("disconnect(): "+ id + " " + App.state().getConnection(id).status().toString());
             mClients.get(id).disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
