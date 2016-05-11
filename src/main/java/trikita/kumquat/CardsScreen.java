@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -145,6 +146,7 @@ public class CardsScreen extends RenderableView {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            App.dispatch(new Action<>(Actions.Topic.REMOVE, new HashSet<>(selected)));
             mode.finish();
             return true;
         }
