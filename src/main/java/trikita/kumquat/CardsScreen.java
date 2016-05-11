@@ -30,7 +30,8 @@ import trikita.jedux.Action;
 
 public class CardsScreen extends RenderableView {
 
-    private RenderableRecyclerViewAdapter mAdapter = new CardAdapter();
+    private CardAdapter mAdapter = new CardAdapter();
+
     private boolean mLockUiUpdate = false;
 
     public CardsScreen(Context context) {
@@ -168,6 +169,12 @@ public class CardsScreen extends RenderableView {
             actionMode = null;
             Anvil.render();
         }
+
+        public void exitActionMode() {
+            if (actionMode != null) {
+                actionMode.finish();
+            }
+        }
     }
 
     private class CardTouchHelperCallback extends ItemTouchHelper.Callback {
@@ -198,6 +205,7 @@ public class CardsScreen extends RenderableView {
             App.dispatch(new Action<>(Actions.Topic.MOVE, new Pair(source.getAdapterPosition(), target.getAdapterPosition())));
 
             // Notify the adapter of the move
+            mAdapter.exitActionMode();
             mAdapter.notifyItemMoved(source.getAdapterPosition(), target.getAdapterPosition());
 
             return true;
