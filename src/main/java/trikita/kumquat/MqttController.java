@@ -21,6 +21,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import trikita.jedux.Action;
 import trikita.jedux.Store;
 
+import trikita.kumquat.State.Card;
 import trikita.kumquat.State.ConnectionStatus;
 import trikita.kumquat.State.MqttServer;
 
@@ -125,7 +126,12 @@ public class MqttController implements Store.Middleware<Action, State> {
             @Override
             public void onSuccess(IMqttToken asyncActionToken) {
                 Log.d(tag, "Connected successfully");
-                //subscribe();
+                for (Card c : App.state().cards()) {
+                    if (c.connId().equals(connId)) {
+                        System.out.println("subscripting: serverId="+connId+" topic="+c.topic());
+                        subscribe(c);
+                    }
+                }
                 System.out.println("Status "+App.state().getConnection(connId).status());
                 App.dispatch(new Action<>(Actions.Connection.CONNECTED, connId));
             }
@@ -136,6 +142,33 @@ public class MqttController implements Store.Middleware<Action, State> {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void subscribe(Card c) {
+        MqttAndroidClient client = mClients.get(c.connId());
+        if (client == null) {
+            throw new RuntimeException("No MQTT client with id " + c.connId());
+        }
+
+        System.out.println("subscribe(): card="+c.id()+" topic="+c.topic());
+
+        int qos = 1;
+        try {
+            IMqttToken subToken = client.subscribe(c.topic(), qos);
+            subToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    System.out.println("Subscripted to the topic "+asyncActionToken.getTopics()[0]);
+                }
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    System.out.println("Failed to subscribe to the topic "+asyncActionToken.getTopics()[0]);
+                    exception.printStackTrace();
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
     }
 
     private void disconnect(String id) {
