@@ -2,6 +2,7 @@ package trikita.kumquat;
 
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -92,6 +93,25 @@ public abstract class State {
         return null;
     }
     
+    Card getCard(String id) {
+        for (Card c : cards()) {
+            if (c.id().equals(id)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    java.util.List<Card> getCardsByTopic(String topic, String connId) {
+        java.util.List<Card> list = new ArrayList<>();
+        for (Card c : cards()) {
+            if (c.connId().equals(connId) && c.topic().equals(topic)) {
+                list.add(c);
+            }
+        }
+        return list;
+    }
+
     static State getDefault() {
         return ImmutableState.builder()
             .connections(IndexedLists.of(ImmutableMqttServer.builder()
