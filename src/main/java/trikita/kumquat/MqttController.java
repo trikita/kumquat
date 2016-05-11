@@ -77,6 +77,19 @@ public class MqttController implements Store.Middleware<Action, State> {
                     }
                     break;
             }
+        } else if (action.type instanceof Actions.Topic) {
+            Actions.Topic type = (Actions.Topic) action.type;
+            Card card;
+            switch (type) {
+                case CREATE:
+                    card = (Card) action.value;
+                    System.out.println("CREATE: card="+card.id());
+                    for (Card c : store.getState().cards()) {
+                        System.out.println("existing card " + c.id() + " " + c.topic());
+                    }
+                    subscribe(card);
+                    break;
+            }
         }
         next.dispatch(action);
     }
