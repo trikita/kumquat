@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,8 @@ import trikita.anvil.design.DesignDSL;
 import trikita.anvil.recyclerview.v7.RecyclerViewv7DSL;
 
 import static trikita.anvil.DSL.*;
+
+import trikita.jedux.Action;
 
 public class CardsScreen extends RenderableView {
 
@@ -45,6 +48,11 @@ public class CardsScreen extends RenderableView {
     public void view() {
         mAdapter.notifyDataSetChanged();
         RecyclerViewv7DSL.recyclerView(() -> {
+            init(() -> {
+                ItemTouchHelper.Callback cb = new CardTouchHelperCallback();
+                ItemTouchHelper touchHelper = new ItemTouchHelper(cb);
+                touchHelper.attachToRecyclerView(Anvil.currentView());
+            });
             RecyclerViewv7DSL.gridLayoutManager(2);
             RecyclerViewv7DSL.hasFixedSize(false);
             RecyclerViewv7DSL.itemAnimator(new DefaultItemAnimator());
@@ -156,6 +164,35 @@ public class CardsScreen extends RenderableView {
             selected.clear();
             actionMode = null;
             Anvil.render();
+        }
+    }
+
+    private class CardTouchHelperCallback extends ItemTouchHelper.Callback {
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return true;
+        }
+
+        @Override
+        public boolean isItemViewSwipeEnabled() {
+            return false;
+        }
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            // Set movement flags based on the layout manager
+            final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+            return makeMovementFlags(dragFlags, 0);
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder holder, int direction) { }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
+            App.dispatch(new Action<>(Actions.Topic.MOVE, new Pair(source.getAdapterPosition(), target.getAdapterPosition())));
+            return true;
         }
     }
 }
