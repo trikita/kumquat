@@ -130,7 +130,16 @@ public class MqttController implements Store.Middleware<Action, State> {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 Log.d(tag, "Incoming message: " + new String(message.getPayload()));
-                // TODO emit an action
+                java.util.List<Card> cards = App.state().getCardsByTopic(topic, connId);
+                if (cards.size() != 0) {
+                    System.out.println("messageArrived(): conn "+connId+" topic "+topic);
+                    for (Card c : cards) {
+                        c = ImmutableCard.copyOf(c).withValue(new String(message.getPayload()));
+                        App.dispatch(new Action<>(Actions.Topic.MODIFY, c));
+                    }
+                } else {
+                    System.out.println("messageArrived(): no card for conn "+connId+" with topic "+topic);
+                }
             }
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) { }
