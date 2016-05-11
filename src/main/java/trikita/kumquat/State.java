@@ -121,10 +121,25 @@ public abstract class State {
                         .clientId("")
                         .status(ConnectionStatus.DISCONNECTED)
                         .build()))
-            .cards(IndexedLists.of())
+            .cards(defaultCards())
             .favourites(IndexedLists.of())
             .screen(Navigation.CONNECTIONS)
             .build();
+    }
+
+    private static List<Card> defaultCards() {
+        List<Card> list = IndexedLists.of();
+        String[] topics = { "1", "2", "3", "4", "5", "6", "7" };
+        for (String topic : topics) {
+            list = list.append(ImmutableCard.builder()
+                    .id(generateId())
+                    .name("")
+                    .topic(topic)
+                    .value("")
+                    .connId("")
+                    .build());
+        }
+        return list;
     }
 
     static String generateId() {
