@@ -66,6 +66,7 @@ public abstract class State {
         public abstract String name();
         public abstract String topic();
         public abstract String value();
+        public abstract String connId();
         // TODO: QoS, retain
         // TODO: Card type: read-only, text, toggle, slider, push button
         // TODO: min/max for slider cards
