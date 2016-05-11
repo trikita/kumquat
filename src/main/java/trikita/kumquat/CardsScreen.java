@@ -61,9 +61,15 @@ public class CardsScreen extends RenderableView {
         @Override
         public void view(RecyclerView.ViewHolder holder) {
             int pos = holder.getAdapterPosition();
+            String cardId = App.state().cards().get(pos).id();
             CardViewv7DSL.cardView(() -> {
                 size(FILL, FILL);
                 margin(dip(8));
+                onClick((v) -> {
+                    Intent intent = new Intent(getContext(), CardEditorActivity.class);
+                    intent.putExtra("id", cardId);
+                    v.getContext().startActivity(intent);
+                });
 
                 linearLayout(() -> {
                     size(FILL, FILL);
