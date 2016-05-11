@@ -31,6 +31,7 @@ import trikita.jedux.Action;
 public class CardsScreen extends RenderableView {
 
     private RenderableRecyclerViewAdapter mAdapter = new CardAdapter();
+    private boolean mLockUiUpdate = false;
 
     public CardsScreen(Context context) {
         super(context);
@@ -46,7 +47,9 @@ public class CardsScreen extends RenderableView {
 
     @Override
     public void view() {
-        mAdapter.notifyDataSetChanged();
+        if (!mLockUiUpdate) {
+            mAdapter.notifyDataSetChanged();
+        }
         RecyclerViewv7DSL.recyclerView(() -> {
             init(() -> {
                 ItemTouchHelper.Callback cb = new CardTouchHelperCallback();
@@ -191,8 +194,20 @@ public class CardsScreen extends RenderableView {
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
+            mLockUiUpdate = true;
             App.dispatch(new Action<>(Actions.Topic.MOVE, new Pair(source.getAdapterPosition(), target.getAdapterPosition())));
+
+            // Notify the adapter of the move
+            mAdapter.notifyItemMoved(source.getAdapterPosition(), target.getAdapterPosition());
+
             return true;
+        }
+
+        @Override
+        public void clearView(RecyclerView r, RecyclerView.ViewHolder holder) {
+            super.clearView(r, holder);
+            mLockUiUpdate = false;
+            Anvil.render();
         }
     }
 }
