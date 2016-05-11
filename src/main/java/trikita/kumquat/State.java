@@ -1,5 +1,6 @@
 package trikita.kumquat;
 
+import android.util.Pair;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -157,10 +158,37 @@ public abstract class State {
                         return cards.append((Card) action.value);
                     case MODIFY:
                         Card modifiedCard = (Card) action.value;
-                        int i = cardIndexOf(cards, modifiedCard.id());
-                        return IndexedLists.copyOf(cards).set(i, modifiedCard);
+                        int index = cardIndexOf(cards, modifiedCard.id());
+                        return IndexedLists.copyOf(cards).set(index, modifiedCard);
+                    case MOVE:
+                        int from = ((Pair<Integer, Integer>) action.value).first;
+                        int to = ((Pair<Integer, Integer>) action.value).second;
+                        Card moved = cards.get(from);
+                        List<Card> updated = IndexedLists.of();
+                        if (from < to) {
+                            for (int i = 0; i < cards.size(); i++) {
+                                if (i == from) {
+                                    continue;
+                                }
+                                updated = updated.append(cards.get(i));
+                                if (i == to) {
+                                    updated = updated.append(moved);
+                                }
+                            }
+                        } else {
+                            for (int i = 0; i < cards.size(); i++) {
+                                if (i == from) {
+                                    continue;
+                                }
+                                if (i == to) {
+                                    updated = updated.append(moved);
+                                }
+                                updated = updated.append(cards.get(i));
+                            }
+                        }
+                        return updated;
                     case REMOVE:
-                        List<MqttServer> filtered = IndexedLists.of();
+                        List<Card> filtered = IndexedLists.of();
                         Set<String> removed = (Set<String>) action.value;
                         for (Card c : cards) {
                             if (!removed.contains(c.id())) {
