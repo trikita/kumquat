@@ -160,7 +160,14 @@ public abstract class State {
                         int i = cardIndexOf(cards, modifiedCard.id());
                         return IndexedLists.copyOf(cards).set(i, modifiedCard);
                     case REMOVE:
-                        break;
+                        List<MqttServer> filtered = IndexedLists.of();
+                        Set<String> removed = (Set<String>) action.value;
+                        for (Card c : cards) {
+                            if (!removed.contains(c.id())) {
+                                filtered = filtered.append(c);
+                            }
+                        }
+                        return filtered;
                 }
             }
             return cards;
