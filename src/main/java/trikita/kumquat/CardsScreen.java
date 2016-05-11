@@ -2,13 +2,20 @@ package trikita.kumquat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 
 import com.github.andrewoma.dexx.collection.List;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import trikita.anvil.Anvil;
 import trikita.anvil.RenderableRecyclerViewAdapter;
 import trikita.anvil.RenderableView;
 import trikita.anvil.cardview.v7.CardViewv7DSL;
@@ -56,7 +63,16 @@ public class CardsScreen extends RenderableView {
         }
     }
 
-    private class CardAdapter extends RenderableRecyclerViewAdapter {
+    private class CardAdapter extends RenderableRecyclerViewAdapter implements ActionMode.Callback {
+
+        private final Set<String> selected = new HashSet<>();
+
+        private ActionMode actionMode = null;
+
+        @Override
+        public int getItemCount() {
+            return cards().size();
+        }
 
         @Override
         public void view(RecyclerView.ViewHolder holder) {
@@ -66,14 +82,30 @@ public class CardsScreen extends RenderableView {
                 size(FILL, FILL);
                 margin(dip(8));
                 onClick((v) -> {
-                    Intent intent = new Intent(getContext(), CardEditorActivity.class);
-                    intent.putExtra("id", cardId);
-                    v.getContext().startActivity(intent);
+                    if (actionMode == null) {
+                        Intent intent = new Intent(getContext(), CardEditorActivity.class);
+                        intent.putExtra("id", cardId);
+                        v.getContext().startActivity(intent);
+                    } else {
+                        toggleSelection(cardId);
+                    }
+                });
+                onLongClick((v) -> {
+                    if (actionMode == null) {
+                        actionMode = ((AppCompatActivity) getContext()) .startSupportActionMode(this);
+                        selected.add(cardId);
+                    }
+                    return false;
                 });
 
                 linearLayout(() -> {
                     size(FILL, FILL);
                     orientation(LinearLayout.VERTICAL);
+                    if (actionMode != null) {
+                        backgroundColor(selected.contains(cardId) ? 0x77ffff00 : 0x77777777);
+                    } else {
+                        backgroundColor(0);
+                    }
 
                     textView(() -> {
                         size(FILL, WRAP);
@@ -88,10 +120,40 @@ public class CardsScreen extends RenderableView {
             });
         }
 
+        private void toggleSelection(String id) {
+            if (selected.contains(id)) {
+                selected.remove(id);
+                if (selected.size() == 0 && actionMode != null) {
+                    actionMode.finish();
+                    actionMode = null;
+                }
+            } else {
+                selected.add(id);
+            }
+        }
+
         @Override
-        public int getItemCount() {
-            System.out.println("getItemCount = " + cards().size());
-            return cards().size();
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate (R.menu.multi_selector_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            mode.finish();
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            selected.clear();
+            actionMode = null;
+            Anvil.render();
         }
     }
 }
