@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.LinearLayout;
 
 import com.github.andrewoma.dexx.collection.List;
 
@@ -59,8 +60,25 @@ public class CardsScreen extends RenderableView {
 
         @Override
         public void view(RecyclerView.ViewHolder holder) {
+            int pos = holder.getAdapterPosition();
             CardViewv7DSL.cardView(() -> {
-                size(FILL, dip(160));
+                size(FILL, FILL);
+                margin(dip(8));
+
+                linearLayout(() -> {
+                    size(FILL, FILL);
+                    orientation(LinearLayout.VERTICAL);
+
+                    textView(() -> {
+                        size(FILL, WRAP);
+                        text(App.state().cards().get(pos).value());
+                    });
+
+                    textView(() -> {
+                        size(FILL, WRAP);
+                        text(App.state().cards().get(pos).topic());
+                    });
+                });
             });
         }
 
