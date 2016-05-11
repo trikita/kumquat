@@ -115,6 +115,7 @@ public abstract class State {
         public State reduce(Action action, State old) {
             return ImmutableState.builder().from(old)
                     .connections(reduceConnections(action, old.connections()))
+                    .cards(reduceCards(action, old.cards()))
                     .screen(reduceNavigation(action, old.screen()))
                     .build();
         }
@@ -126,7 +127,26 @@ public abstract class State {
             return screen;
         }
 
-        List<MqttServer> reduceConnections(Action action, List<MqttServer> connections) {
+        private List<Card> reduceCards(Action action, List<Card> cards) {
+            if (action.type instanceof Actions.Topic) {
+                Actions.Topic type = (Actions.Topic) action.type;
+                switch (type) {
+                    case PUBLISH:
+                        break;
+                    case CREATE:
+                        return cards.append((Card) action.value);
+                    case MODIFY:
+                        Card modifiedCard = (Card) action.value;
+                        int i = cardIndexOf(cards, modifiedCard.id());
+                        return IndexedLists.copyOf(cards).set(i, modifiedCard);
+                    case REMOVE:
+                        break;
+                }
+            }
+            return cards;
+        }
+
+        private List<MqttServer> reduceConnections(Action action, List<MqttServer> connections) {
             if (action.type instanceof Actions.Connection) {
                 Actions.Connection type = (Actions.Connection) action.type;
                 switch (type) {
@@ -140,7 +160,7 @@ public abstract class State {
                         return connections.append((MqttServer) action.value);
                     case MODIFY:
                         MqttServer modifiedConn = (MqttServer) action.value;
-                        int i = indexOf(connections, modifiedConn.id());
+                        int i = connIndexOf(connections, modifiedConn.id());
                         return IndexedLists.copyOf(connections).set(i, modifiedConn);
                     case REMOVE:
                         List<MqttServer> filtered = IndexedLists.of();
@@ -156,7 +176,18 @@ public abstract class State {
             return connections;
         }
 
-        static int indexOf(List<MqttServer> list, String id) {
+        static int cardIndexOf(List<Card> list, String id) {
+            int index = 0;
+            for (Card card : list) {
+                if (card.id().equals(id)) {
+                    return index;
+                }
+                index++;
+            }
+            return -1;
+        }
+
+        static int connIndexOf(List<MqttServer> list, String id) {
             int index = 0;
             for (MqttServer ms : list) {
                 if (ms.id().equals(id)) {
@@ -168,7 +199,7 @@ public abstract class State {
         }
 
         static List<MqttServer> withStatus(List<MqttServer> list, String id, ConnectionStatus status) {
-            int i = indexOf(list, id);
+            int i = connIndexOf(list, id);
             return IndexedLists.copyOf(list).set(i, ImmutableMqttServer.copyOf(list.get(i)).withStatus(status));
         }
     }
