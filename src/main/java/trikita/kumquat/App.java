@@ -37,5 +37,3 @@ public class App extends Application {
         return sInstance.store.dispatch(action);
     }
 }
-
-

@@ -169,7 +169,7 @@ public abstract class State {
                     .value("")
                     .connId("")
                     .subQoS(0)
-                    .params(ImmutableTextCardParams.builder().build())
+                    .params(ImmutableButtonCardParams.builder().payload("hey!").build())
                     .build());
         }
         return list;
