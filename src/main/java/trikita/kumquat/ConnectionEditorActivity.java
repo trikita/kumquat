@@ -12,12 +12,7 @@ import static trikita.anvil.DSL.*;
 
 public class ConnectionEditorActivity extends AppCompatActivity implements Anvil.Renderable {
 
-    private State.MqttServer conn = ImmutableMqttServer.builder()
-            .id(State.generateId())
-            .uri("")
-            .clientId("")
-            .status(State.ConnectionStatus.DISCONNECTED)
-            .build();
+    private State.MqttServer conn;
 
     private boolean create = true;
 
@@ -28,6 +23,16 @@ public class ConnectionEditorActivity extends AppCompatActivity implements Anvil
         if (id != null) {
             this.conn = ImmutableMqttServer.copyOf(App.state().getConnection(id));
             this.create = false;
+        } else {
+            this.conn = ImmutableMqttServer.builder()
+                    .id(State.generateId())
+                    .name("My connection")
+                    .uri("")
+                    .clientId("")
+                    .status(State.ConnectionStatus.DISCONNECTED)
+                    .username("").password("")
+                    .willTopic("").willPayload("").willQoS(0).willRetain(false)
+                    .build();
         }
         setContentView(Anvil.mount(new FrameLayout(this), this));
     }

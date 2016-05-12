@@ -16,14 +16,7 @@ import trikita.kumquat.State.MqttServer;
 
 public class CardEditorActivity extends AppCompatActivity implements Anvil.Renderable {
 
-    private State.Card card = ImmutableCard.builder()
-            .id(State.generateId())
-            .name("")
-            .topic("")
-            .value("")
-            .connId("")
-            .build();
-
+    private State.Card card;
     private boolean create = true;
 
     private RenderableAdapter mServerAdapter = RenderableAdapter
@@ -44,6 +37,16 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
         if (id != null) {
             this.card = ImmutableCard.copyOf(App.state().getCard(id));
             this.create = false;
+        } else {
+            this.card = ImmutableCard.builder()
+                    .id(State.generateId())
+                    .name("")
+                    .topic("")
+                    .value("")
+                    .connId("")
+                    .subQoS(0)
+                    .params(ImmutableTextCardParams.builder().build())
+                    .build();
         }
         setContentView(Anvil.mount(new FrameLayout(this), this));
     }

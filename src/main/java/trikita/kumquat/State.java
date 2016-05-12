@@ -53,11 +53,16 @@ public abstract class State {
     @Gson.TypeAdapters
     public static abstract class MqttServer {
         public abstract String id();
+        public abstract String name();
         public abstract String uri();
         public abstract String clientId();
-        // TODO: username, password
+        public abstract String username();
+        public abstract String password();
+        public abstract String willTopic();
+        public abstract String willPayload();
+        public abstract int willQoS();
+        public abstract boolean willRetain();
         // TODO: SSL
-        // TODO: will topic, message, QoS, retain
         public abstract ConnectionStatus status();
     }
 
@@ -65,16 +70,35 @@ public abstract class State {
     @Gson.TypeAdapters
     public static abstract class Card {
         public abstract String id();
+        public abstract String connId();
         public abstract String name();
         public abstract String topic();
         public abstract String value();
-        public abstract String connId();
-        // TODO: QoS, retain
-        // TODO: Card type: read-only, text, toggle, slider, push button
-        // TODO: min/max for slider cards
-        // TODO: true/false values for toggle cards
-        // TODO: value for push button cards
-        // TODO: icon and color for toggle and push button cards
+        public abstract int subQoS();
+        public abstract CardParams params();
+
+        @Gson.ExpectedSubtypes({
+                TextCardParams.class,
+                EditTextCardParams.class,
+                ButtonCardParams.class,
+                ToggleCardParams.class,
+                SliderCardParams.class
+        })
+        public interface CardParams {}
+        @Value.Immutable public interface TextCardParams extends CardParams {}
+        @Value.Immutable public interface EditTextCardParams extends CardParams {}
+        @Value.Immutable public interface ButtonCardParams extends CardParams {
+            String payload();
+        }
+        @Value.Immutable public interface ToggleCardParams extends CardParams {
+            String onPayload();
+            String offPayload();
+        }
+        @Value.Immutable public interface SliderCardParams extends CardParams {
+            float min();
+            float max();
+            float step();
+        }
     }
 
     public abstract List<MqttServer> connections();
@@ -115,11 +139,18 @@ public abstract class State {
 
     static State getDefault() {
         return ImmutableState.builder()
-            .connections(IndexedLists.of(ImmutableMqttServer.builder()
+                .connections(IndexedLists.of(ImmutableMqttServer.builder()
                         .id(generateId())
+                        .name("Default")
                         .uri(DEFAULT_SERVER)
                         .clientId("")
                         .status(ConnectionStatus.DISCONNECTED)
+                        .username("")
+                        .password("")
+                        .willTopic("")
+                        .willPayload("")
+                        .willQoS(0)
+                        .willRetain(false)
                         .build()))
             .cards(defaultCards())
             .favourites(IndexedLists.of())
@@ -137,6 +168,8 @@ public abstract class State {
                     .topic(topic)
                     .value("")
                     .connId("")
+                    .subQoS(0)
+                    .params(ImmutableTextCardParams.builder().build())
                     .build());
         }
         return list;
