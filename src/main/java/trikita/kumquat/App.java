@@ -17,10 +17,14 @@ public class App extends Application {
         super.onCreate();
         sInstance = this;
 
-        State initialState = State.getDefault();
+        PersistenceController persistenceController = new PersistenceController(this);
+        State initialState = persistenceController.getSavedState();
+        if (initialState == null) {
+            initialState = State.getDefault();
+        }
         MqttController mqtt = new MqttController(this, initialState.connections());
 
-        this.store = new Store<>(new State.Reducer(), initialState, mqtt);
+        this.store = new Store<>(new State.Reducer(), initialState, persistenceController, mqtt);
 
         this.store.subscribe(Anvil::render);
     }
