@@ -7,4 +7,5 @@
     <string name="nav_cards">Cards</string>
     <string name="nav_favourites">Favourites</string>
     <string name="menu_remove">Remove</string>
+    <string name="menu_save">Save</string>
 </resources>
