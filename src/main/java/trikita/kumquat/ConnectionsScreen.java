@@ -2,13 +2,14 @@ package trikita.kumquat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
-import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
@@ -17,6 +18,7 @@ import android.widget.LinearLayout;
 import java.util.HashSet;
 import java.util.Set;
 
+import static trikita.anvil.DSL.*;
 import trikita.anvil.Anvil;
 import trikita.anvil.RenderableRecyclerViewAdapter;
 import trikita.anvil.RenderableView;
@@ -24,10 +26,8 @@ import trikita.anvil.appcompat.v7.AppCompatv7DSL;
 import trikita.anvil.cardview.v7.CardViewv7DSL;
 import trikita.anvil.design.DesignDSL;
 import trikita.anvil.recyclerview.v7.RecyclerViewv7DSL;
+
 import trikita.jedux.Action;
-
-import static trikita.anvil.DSL.*;
-
 import trikita.kumquat.State.ConnectionStatus;
 
 public class ConnectionsScreen extends RenderableView {
@@ -39,24 +39,58 @@ public class ConnectionsScreen extends RenderableView {
     }
 
     public void view() {
-        RecyclerViewv7DSL.recyclerView(() -> {
-            RecyclerViewv7DSL.linearLayoutManager();
-            RecyclerViewv7DSL.hasFixedSize(true);
-            RecyclerViewv7DSL.itemAnimator(new DefaultItemAnimator());
-            RecyclerViewv7DSL.adapter(mAdapter);
-        });
-        DesignDSL.floatingActionButton(() -> {
-            size(WRAP, WRAP);
-            margin(dip(32));
-            DesignDSL.compatElevation(dip(4));
-            layoutGravity(BOTTOM | END);
-            onClick(v -> {
-                Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
-                v.getContext().startActivity(intent);
+        linearLayout(() -> {
+            orientation(LinearLayout.VERTICAL);
+
+            AppCompatv7DSL.toolbar(() -> {
+                init(() -> {
+                    ((AppCompatActivity) getContext()).setSupportActionBar(Anvil.currentView());
+                    ((AppCompatActivity) getContext()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    ((AppCompatActivity) getContext()).getSupportActionBar().setHomeButtonEnabled(true);
+                    ((AppCompatActivity) getContext()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+                    ((KumquatActivity) getContext()).drawerToggle().syncState();
+                });
+                size(FILL, dip(54));
+                backgroundColor(0xff2ecc71);
+                DesignDSL.compatElevation(dip(4));
+                AppCompatv7DSL.navigationOnClickListener(v -> {
+                    ((KumquatActivity) getContext()).drawer().openDrawer(GravityCompat.START);
+                });
+
+                textView(() -> {
+                    size(WRAP, WRAP);
+                    text("Kumquat");
+                    textSize(sip(20));
+                    layoutGravity(CENTER_VERTICAL);
+                    textColor(Color.WHITE);
+                });
+            });
+
+            frameLayout(() -> {
+                RecyclerViewv7DSL.recyclerView(() -> {
+                    RecyclerViewv7DSL.linearLayoutManager();
+                    RecyclerViewv7DSL.hasFixedSize(true);
+                    RecyclerViewv7DSL.itemAnimator(new DefaultItemAnimator());
+                    RecyclerViewv7DSL.adapter(mAdapter);
+                    size(FILL, WRAP);
+                });
+
+                DesignDSL.floatingActionButton(() -> {
+                    size(WRAP, WRAP);
+                    margin(dip(24));
+                    layoutGravity(BOTTOM | END);
+                    imageResource(R.drawable.ic_add);
+                    DesignDSL.backgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{0xff27ae60}));
+                    DesignDSL.compatElevation(dip(4));
+                    onClick(v -> {
+                        Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
+                        v.getContext().startActivity(intent);
+                    });
+                });
             });
         });
+
         post(() -> {
-            System.out.println("notifyDataSetChanged()");
             mAdapter.notifyDataSetChanged();
         });
     }
