@@ -175,23 +175,32 @@ public abstract class State {
 
     static State getDefault() {
         return ImmutableState.builder()
-                .connections(IndexedLists.of(ImmutableMqttServer.builder()
-                        .id(generateId())
-                        .name("Default")
-                        .uri(DEFAULT_SERVER)
-                        .clientId("")
-                        .status(ConnectionStatus.DISCONNECTED)
-                        .username("")
-                        .password("")
-                        .willTopic("")
-                        .willPayload("")
-                        .willQoS(0)
-                        .willRetain(false)
-                        .build()))
-            .cards(defaultCards())
-            .favourites(IndexedLists.of())
-            .screen(Navigation.CONNECTIONS)
-            .build();
+                .connections(defaultConnections())
+                .cards(defaultCards())
+                .favourites(IndexedLists.of())
+                .screen(Navigation.CONNECTIONS)
+                .build();
+    }
+
+    private static List<MqttServer> defaultConnections() {
+        List<MqttServer> list = IndexedLists.of();
+        for (int i = 0; i < 7; i++) {
+            list = list.append(ImmutableMqttServer.builder()
+                    .id(generateId())
+                    .name("Default #"+i)
+                    .host(DEFAULT_HOST)
+                    .port(DEFAULT_PORT)
+                    .clientId("")
+                    .status(ConnectionStatus.DISCONNECTED)
+                    .username("")
+                    .password("")
+                    .willTopic("")
+                    .willPayload("")
+                    .willQoS(0)
+                    .willRetain(false)
+                    .build());
+        }
+        return list;
     }
 
     private static List<Card> defaultCards() {
