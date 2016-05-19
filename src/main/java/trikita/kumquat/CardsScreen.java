@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -17,6 +19,7 @@ import android.widget.LinearLayout;
 
 import com.github.andrewoma.dexx.collection.List;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +33,8 @@ import trikita.anvil.design.DesignDSL;
 import trikita.anvil.recyclerview.v7.RecyclerViewv7DSL;
 
 import trikita.jedux.Action;
+
+import trikita.kumquat.State.CardType;
 
 public class CardsScreen extends RenderableView {
 
@@ -129,9 +134,15 @@ public class CardsScreen extends RenderableView {
         }
 
         @Override
+        public int getItemViewType(int position) {
+            return Arrays.asList(CardType.values()).indexOf(State.cardType(cards().get(position)));
+        }
+
+        @Override
         public void view(RecyclerView.ViewHolder holder) {
             int pos = holder.getAdapterPosition();
-            String cardId = App.state().cards().get(pos).id();
+            String cardId = cards().get(pos).id();
+
             CardViewv7DSL.cardView(() -> {
                 size(FILL, FILL);
                 margin(dip(8));
@@ -155,20 +166,157 @@ public class CardsScreen extends RenderableView {
                 linearLayout(() -> {
                     size(FILL, FILL);
                     orientation(LinearLayout.VERTICAL);
+                    margin(dip(10));
                     if (actionMode != null) {
                         backgroundColor(selected.contains(cardId) ? 0x77ffff00 : 0x77777777);
                     } else {
                         backgroundColor(0);
                     }
 
-                    textView(() -> {
+                    cardItem(pos, CardType.values()[holder.getItemViewType()]);
+                });
+            });
+        }
+
+        private void cardItem(int pos, CardType type) {
+            linearLayout(() -> {
+                size(FILL, WRAP);
+                gravity(TOP);
+
+                frameLayout(() -> {
+                    size(0, dip(100));
+                    weight(1);
+
+                    switch (type) {
+                        case BUTTON:
+                            buttonItem(cards().get(pos).name().charAt(0));
+                            break;
+                        case SWITCH:
+                            switchItem();
+                            break;
+                        case SLIDEBAR:
+                            slidebarItem(pos);
+                            break;
+                        default:
+                            textView(() -> {
+                                size(WRAP, dip(100));
+                                layoutGravity(CENTER);
+                                gravity(CENTER);
+                                text(""+type+" "+cards().get(pos).value());
+                                typeface("fonts/Roboto-Light.ttf");
+                                textSize(sip(24));
+                            });
+                    }
+                });
+
+                textView(() -> {
+                    size(WRAP, FILL);
+                    gravity(TOP);
+                    text("\ue838");
+                    textColor(type.primaryColor);
+                    textSize(sip(20));
+                    typeface("fonts/MaterialIcons-Regular.ttf");
+                });
+            });
+            linearLayout(() -> {
+                gravity(CENTER_VERTICAL);
+
+                textView(() -> {
+                    size(0, WRAP);
+                    weight(1);
+                    layoutGravity(CENTER_VERTICAL);
+                    text(cards().get(pos).name());
+                    textSize(sip(18));
+                    textColor(type.primaryColor);
+                    typeface("fonts/Roboto-Light.ttf");
+                });
+
+                textView(() -> {
+                    size(WRAP, WRAP);
+                    text("\ue3c9");
+                    textColor(type.primaryColor);
+                    textSize(sip(20));
+                    typeface("fonts/MaterialIcons-Regular.ttf");
+                });
+            });
+        }
+
+        private void buttonItem(char ch) {
+            ShapeDrawable circle = new ShapeDrawable(new OvalShape());
+            circle.getPaint().setColor(0xff95a5a6);
+
+            textView(() -> {
+                size(dip(64), dip(64));
+                layoutGravity(CENTER);
+                backgroundDrawable(circle);
+                text(Character.toString(ch));
+                textColor(Color.WHITE);
+                textSize(sip(25));
+                typeface("fonts/Roboto-Light.ttf");
+                allCaps(true);
+                gravity(CENTER);
+            });
+        }
+
+        private void switchItem() {
+            AppCompatv7DSL.switchCompat(() -> {
+                size(WRAP, WRAP);
+                layoutGravity(CENTER);
+            });
+        }
+
+        private void slidebarItem(int pos) {
+            linearLayout(() -> {
+                size(FILL, FILL);
+                gravity(CENTER_VERTICAL);
+
+                linearLayout(() -> {
+                    size(FILL, WRAP);
+                    orientation(LinearLayout.VERTICAL);
+
+                    linearLayout(() -> {
                         size(FILL, WRAP);
-                        text(App.state().cards().get(pos).value());
+                        orientation(LinearLayout.VERTICAL);
+                        gravity(CENTER_HORIZONTAL);
+                        margin(0, 0, 0, dip(10));
+
+                        linearLayout(() -> {
+                            size(WRAP, WRAP);
+                            gravity(CENTER_VERTICAL);
+
+                            textView(() -> {
+                                size(dip(32), dip(32));
+                                text("\u2014");
+                                textSize(sip(24));
+                                typeface("fonts/Roboto-Light.ttf");
+                                textColor(0xff777777);
+                                gravity(CENTER);
+                            });
+
+                            textView(() -> {
+                                size(WRAP, WRAP);
+                                padding(dip(5));
+                                margin(dip(3), 0);
+                                text("0");
+                                textSize(sip(20));
+                                typeface("fonts/Roboto-Light.ttf");
+                                gravity(CENTER);
+                            });
+
+                            textView(() -> {
+                                size(dip(32), dip(32));
+                                text("+");
+                                textSize(sip(24));
+                                typeface("fonts/Roboto-Light.ttf");
+                                textColor(0xff777777);
+                                gravity(CENTER);
+                            });
+                        });
                     });
 
-                    textView(() -> {
+                    AppCompatv7DSL.appCompatSeekBar(() -> {
                         size(FILL, WRAP);
-                        text(App.state().cards().get(pos).topic());
+                        padding(dip(10), 0);
                     });
                 });
             });
