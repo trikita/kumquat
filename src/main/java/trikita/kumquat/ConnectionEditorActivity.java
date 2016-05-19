@@ -13,6 +13,7 @@ import android.widget.RadioGroup;
 import static trikita.anvil.DSL.*;
 import trikita.anvil.Anvil;
 import trikita.anvil.appcompat.v7.AppCompatv7DSL;
+import trikita.anvil.cardview.v7.CardViewv7DSL;
 import trikita.anvil.design.DesignDSL;
 
 import trikita.jedux.Action;
@@ -101,87 +102,102 @@ public class ConnectionEditorActivity extends AppCompatActivity implements Anvil
                 linearLayout(() -> {
                     size(FILL, WRAP);
                     orientation(LinearLayout.VERTICAL);
-                    margin(dip(8));
 
-                    DesignDSL.textInputLayout(() -> {
-                        DesignDSL.hintEnabled(true);
-                        DesignDSL.hint("Name");
-
-                        AppCompatv7DSL.appCompatEditText(() -> {
-                            text(conn.name());
-                            typeface("fonts/Roboto-Light.ttf");
-                            onTextChanged(s -> {
-                                conn = ImmutableMqttServer.copyOf(conn).withName(s.toString());
-                            });
-                        });
+                    textView(() -> {
+                        size(FILL, WRAP);
+                        padding(dip(10));
+                        text("GENERAL");
                     });
 
-                    linearLayout(() -> {
+                    CardViewv7DSL.cardView(() -> {
                         size(FILL, WRAP);
+                        margin(dip(8), dip(4));
 
-                        DesignDSL.textInputLayout(() -> {
-                            size(0, WRAP);
-                            weight(1);
-                            margin(0, 0, dip(10), 0);
-                            DesignDSL.hintEnabled(true);
-                            DesignDSL.hint("Host");
+                        linearLayout(() -> {
+                            orientation(LinearLayout.VERTICAL);
+                            margin(dip(5), dip(10), dip(5), dip(15));
 
-                            AppCompatv7DSL.appCompatEditText(() -> {
-                                text(conn.host());
-                                typeface("fonts/Roboto-Light.ttf");
-                                onTextChanged(s -> {
-                                    conn = ImmutableMqttServer.copyOf(conn).withHost(s.toString());
+                            DesignDSL.textInputLayout(() -> {
+                                DesignDSL.hintEnabled(true);
+                                DesignDSL.hint("Name");
+
+                                AppCompatv7DSL.appCompatEditText(() -> {
+                                    text(conn.name());
+                                    typeface("fonts/Roboto-Light.ttf");
+                                    onTextChanged(s -> {
+                                        conn = ImmutableMqttServer.copyOf(conn).withName(s.toString());
+                                    });
                                 });
                             });
-                        });
 
-                        DesignDSL.textInputLayout(() -> {
-                            size(dip(70), WRAP);
-                            DesignDSL.hintEnabled(true);
-                            DesignDSL.hint("Port");
+                            linearLayout(() -> {
+                                size(FILL, WRAP);
 
-                            AppCompatv7DSL.appCompatEditText(() -> {
-                                text(conn.port());
-                                typeface("fonts/Roboto-Light.ttf");
-                                onTextChanged(s -> {
-                                    conn = ImmutableMqttServer.copyOf(conn).withPort(s.toString());
+                                DesignDSL.textInputLayout(() -> {
+                                    size(0, WRAP);
+                                    weight(1);
+                                    margin(0, 0, dip(10), 0);
+                                    DesignDSL.hintEnabled(true);
+                                    DesignDSL.hint("Host");
+
+                                    AppCompatv7DSL.appCompatEditText(() -> {
+                                        text(conn.host());
+                                        typeface("fonts/Roboto-Light.ttf");
+                                        onTextChanged(s -> {
+                                            conn = ImmutableMqttServer.copyOf(conn).withHost(s.toString());
+                                        });
+                                    });
+                                });
+
+                                DesignDSL.textInputLayout(() -> {
+                                    size(dip(70), WRAP);
+                                    DesignDSL.hintEnabled(true);
+                                    DesignDSL.hint("Port");
+
+                                    AppCompatv7DSL.appCompatEditText(() -> {
+                                        text(conn.port());
+                                        typeface("fonts/Roboto-Light.ttf");
+                                        onTextChanged(s -> {
+                                            conn = ImmutableMqttServer.copyOf(conn).withPort(s.toString());
+                                        });
+                                    });
                                 });
                             });
-                        });
-                    });
 
-                    DesignDSL.textInputLayout(() -> {
-                        DesignDSL.hintEnabled(true);
-                        DesignDSL.hint("Client ID");
+                            DesignDSL.textInputLayout(() -> {
+                                DesignDSL.hintEnabled(true);
+                                DesignDSL.hint("Client ID");
 
-                        AppCompatv7DSL.appCompatEditText(() -> {
-                            text(conn.clientId());
-                            typeface("fonts/Roboto-Light.ttf");
-                            onTextChanged(s -> {
-                                conn = ImmutableMqttServer.copyOf(conn).withClientId(s.toString());
+                                AppCompatv7DSL.appCompatEditText(() -> {
+                                    text(conn.clientId());
+                                    typeface("fonts/Roboto-Light.ttf");
+                                    onTextChanged(s -> {
+                                        conn = ImmutableMqttServer.copyOf(conn).withClientId(s.toString());
+                                    });
+                                });
                             });
-                        });
-                    });
 
-                    linearLayout(() -> {
-                        size(FILL, WRAP);
-                        margin(dip(5), dip(25), dip(5), 0);
+                            linearLayout(() -> {
+                                size(FILL, WRAP);
+                                margin(dip(5), dip(25), dip(5), 0);
 
-                        textView(() -> {
-                            size(0, WRAP);
-                            weight(1);
-                            text("Will");
-                            textSize(sip(18));
-                            typeface("fonts/Roboto-Light.ttf");
-                        });
+                                textView(() -> {
+                                    size(0, WRAP);
+                                    weight(1);
+                                    text("Will");
+                                    textSize(sip(18));
+                                    typeface("fonts/Roboto-Light.ttf");
+                                });
 
-                        AppCompatv7DSL.switchCompat(() -> {
-                            size(WRAP, WRAP);
-                            layoutGravity(CENTER_VERTICAL);
-                            onCheckedChange((CompoundButton btn, boolean check) -> {
-                                withWill = check;
+                                AppCompatv7DSL.switchCompat(() -> {
+                                    size(WRAP, WRAP);
+                                    layoutGravity(CENTER_VERTICAL);
+                                    onCheckedChange((CompoundButton btn, boolean check) -> {
+                                        withWill = check;
+                                    });
+                                    checked(withWill);
+                                });
                             });
-                            checked(withWill);
                         });
                     });
 
@@ -190,62 +206,80 @@ public class ConnectionEditorActivity extends AppCompatActivity implements Anvil
                         orientation(LinearLayout.VERTICAL);
                         visibility(withWill);
 
-                        DesignDSL.textInputLayout(() -> {
-                            DesignDSL.hintEnabled(true);
-                            DesignDSL.hint("Topic");
-
-                            AppCompatv7DSL.appCompatEditText(() -> {
-                                text(conn.willTopic());
-                                typeface("fonts/Roboto-Light.ttf");
-                                onTextChanged(s -> {
-                                    conn = ImmutableMqttServer.copyOf(conn).withWillTopic(s.toString());
-                                });
-                            });
-                        });
-
-                        DesignDSL.textInputLayout(() -> {
-                            DesignDSL.hintEnabled(true);
-                            DesignDSL.hint("Message");
-
-                            AppCompatv7DSL.appCompatEditText(() -> {
-                                text(conn.willPayload());
-                                typeface("fonts/Roboto-Light.ttf");
-                                onTextChanged(s -> {
-                                    conn = ImmutableMqttServer.copyOf(conn).withWillPayload(s.toString());
-                                });
-                            });
-                        });
-
-                        AppCompatv7DSL.appCompatCheckBox(() -> {
-                            margin(0, dip(10));
-                            text("Retain");
-                            textSize(sip(18));
-                            typeface("fonts/Roboto-Light.ttf");
-                            onCheckedChange((CompoundButton btn, boolean check) -> {
-                                conn = ImmutableMqttServer.copyOf(conn).withWillRetain(check);
-                            });
-                            checked(conn.willRetain());
-                        });
-
                         textView(() -> {
                             size(FILL, WRAP);
-                            margin(dip(5));
-                            text("QoS");
-                            textSize(sip(18));
-                            typeface("fonts/Roboto-Light.ttf");
+                            padding(dip(10));
+                            text("WILL");
                         });
 
-                        radioGroup(() -> {
-                            orientation(LinearLayout.HORIZONTAL);
-                            margin(dip(10), dip(5));
-                            onCheckedChange((RadioGroup rgrp, int checkedId) -> {
-                                System.out.println("onCheckedChange(): "+checkedId);
-                                conn = ImmutableMqttServer.copyOf(conn).withWillQoS(checkedId-RADIOBUTTON_BASE_ID);
-                            });
+                        CardViewv7DSL.cardView(() -> {
+                            size(FILL, WRAP);
+                            margin(dip(8), dip(4));
 
-                            for (int i = 0; i < 3; i++) {
-                                radiobutton(i);
-                            }
+                            linearLayout(() -> {
+                                orientation(LinearLayout.VERTICAL);
+                                margin(dip(5), dip(10), dip(5), dip(15));
+
+                                DesignDSL.textInputLayout(() -> {
+                                    DesignDSL.hintEnabled(true);
+                                    DesignDSL.hint("Topic");
+
+                                    AppCompatv7DSL.appCompatEditText(() -> {
+                                        text(conn.willTopic());
+                                        typeface("fonts/Roboto-Light.ttf");
+                                        onTextChanged(s -> {
+                                            conn = ImmutableMqttServer.copyOf(conn).withWillTopic(s.toString());
+                                        });
+                                    });
+                                });
+
+                                DesignDSL.textInputLayout(() -> {
+                                    DesignDSL.hintEnabled(true);
+                                    DesignDSL.hint("Message");
+
+                                    AppCompatv7DSL.appCompatEditText(() -> {
+                                        text(conn.willPayload());
+                                        typeface("fonts/Roboto-Light.ttf");
+                                        onTextChanged(s -> {
+                                            conn = ImmutableMqttServer.copyOf(conn).withWillPayload(s.toString());
+                                        });
+                                    });
+                                });
+
+                                AppCompatv7DSL.appCompatCheckBox(() -> {
+                                    margin(0, dip(20));
+                                    padding(dip(15), 0, 0, 0);
+                                    text("Retain");
+                                    textSize(sip(18));
+                                    typeface("fonts/Roboto-Light.ttf");
+                                    onCheckedChange((CompoundButton btn, boolean check) -> {
+                                        conn = ImmutableMqttServer.copyOf(conn).withWillRetain(check);
+                                    });
+                                    checked(conn.willRetain());
+                                });
+
+                                radioGroup(() -> {
+                                    orientation(LinearLayout.HORIZONTAL);
+                                    gravity(CENTER_VERTICAL);
+                                    margin(0, dip(5));
+                                    onCheckedChange((RadioGroup rgrp, int checkedId) -> {
+                                        conn = ImmutableMqttServer.copyOf(conn).withWillQoS(checkedId-RADIOBUTTON_BASE_ID);
+                                    });
+
+                                    textView(() -> {
+                                        size(0, WRAP);
+                                        weight(1);
+                                        margin(dip(5), 0, dip(25), 0);
+                                        text("QoS");
+                                        textSize(sip(18));
+                                        typeface("fonts/Roboto-Light.ttf");
+                                    });
+
+                                    for (int i = 0; i < 3; i++) {
+                                        radiobutton(i);
+                                    }
+                                });
+                            });
                         });
                     });
                 });
