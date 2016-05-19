@@ -3,6 +3,12 @@
 	<style name="Theme.App" parent="Theme.AppCompat.Light.NoActionBar">
 		<item name="windowActionModeOverlay">true</item>
 		<item name="colorPrimaryDark">#ff27ae60</item>
+		<item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+	</style>
+
+	<style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+		<item name="spinBars">true</item>
+		<item name="color">@android:color/white</item>
 	</style>
 </resources>
 
