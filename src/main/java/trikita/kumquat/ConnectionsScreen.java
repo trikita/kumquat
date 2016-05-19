@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
@@ -110,10 +113,14 @@ public class ConnectionsScreen extends RenderableView {
         public void view(RecyclerView.ViewHolder holder) {
             int pos = holder.getAdapterPosition();
             String connId = App.state().connections().get(pos).id();
-            System.out.println("view(): "+connId+" "+App.state().connections().get(pos).status().toString());
+
+            char ch = App.state().connections().get(pos).name().charAt(0);
+            ShapeDrawable circle = new ShapeDrawable(new OvalShape());
+            circle.getPaint().setColor(0xff3498db);
+
             CardViewv7DSL.cardView(() -> {
                 size(FILL, WRAP);
-                margin(dip(8));
+                margin(dip(8), dip(4));
                 onClick((v) -> {
                     if (actionMode == null) {
                         Intent intent = new Intent(getContext(), ConnectionEditorActivity.class);
@@ -125,7 +132,7 @@ public class ConnectionsScreen extends RenderableView {
                 });
                 onLongClick((v) -> {
                     if (actionMode == null) {
-                        actionMode = ((AppCompatActivity) getContext()) .startSupportActionMode(this);
+                        actionMode = ((AppCompatActivity) getContext()).startSupportActionMode(this);
                         selected.add(connId);
                     } else {
                         toggleSelection(connId);
@@ -135,11 +142,25 @@ public class ConnectionsScreen extends RenderableView {
 
                 linearLayout(() -> {
                     size(FILL, WRAP);
+                    margin(dip(10), dip(18));
+                    gravity(CENTER_VERTICAL);
+
+                    textView(() -> {
+                        size(dip(48), dip(48));
+                        margin(0, 0, dip(15), 0);
+                        backgroundDrawable(circle);
+                        text(Character.toString(ch));
+                        textColor(Color.WHITE);
+                        textSize(sip(25));
+                        typeface("fonts/Roboto-Light.ttf");
+                        allCaps(true);
+                        gravity(CENTER);
+                        layoutGravity(CENTER);
+                    });
 
                     linearLayout(() -> {
                         size(0, WRAP);
                         weight(1);
-                        margin(dip(12));
                         orientation(LinearLayout.VERTICAL);
 
                         textView(() -> {
@@ -150,22 +171,31 @@ public class ConnectionsScreen extends RenderableView {
 
                         textView(() -> {
                             size(WRAP, WRAP);
-                            text(App.state().connections().get(pos).uri());
+                            margin(0, 0, 0, dip(5));
+                            text(App.state().connections().get(pos).name());
+                            textSize(sip(16));
+                            textColor(0xff000000);
+                            typeface("fonts/Roboto-Light.ttf");
+                            allCaps(true);
+                            ellipsize(TextUtils.TruncateAt.MARQUEE);
+                            singleLine(true);
                         });
                         textView(() -> {
                             size(WRAP, WRAP);
-                            text(State.ConnectionStatus.toString(App.state().connections().get(pos).status()));
-                            allCaps(true);
+                            text(App.state().connections().get(pos).host()+":"+App.state().connections().get(pos).port());
+                            textSize(sip(14));
+                            textColor(0xff777777);
+                            typeface("fonts/Roboto-Light.ttf");
+                            ellipsize(TextUtils.TruncateAt.MARQUEE);
+                            singleLine(true);
                         });
                     });
 
-                    System.out.println("rendering card view at position " + pos);
                     AppCompatv7DSL.switchCompat(() -> {
                         size(WRAP, WRAP);
                         layoutGravity(CENTER_VERTICAL);
                         enabled(App.state().connections().get(pos).status() != ConnectionStatus.CONNECTING);
                         onCheckedChange((CompoundButton btn, boolean check) -> {
-                            System.out.println("onCheckedChange(): "+check);
                             if (check) {
                                 App.dispatch(new Action<>(Actions.Connection.CONNECT, connId));
                             } else {
