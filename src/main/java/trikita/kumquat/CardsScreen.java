@@ -2,6 +2,9 @@ package trikita.kumquat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -17,14 +20,14 @@ import com.github.andrewoma.dexx.collection.List;
 import java.util.HashSet;
 import java.util.Set;
 
+import static trikita.anvil.DSL.*;
 import trikita.anvil.Anvil;
 import trikita.anvil.RenderableRecyclerViewAdapter;
 import trikita.anvil.RenderableView;
+import trikita.anvil.appcompat.v7.AppCompatv7DSL;
 import trikita.anvil.cardview.v7.CardViewv7DSL;
 import trikita.anvil.design.DesignDSL;
 import trikita.anvil.recyclerview.v7.RecyclerViewv7DSL;
-
-import static trikita.anvil.DSL.*;
 
 import trikita.jedux.Action;
 
@@ -51,29 +54,67 @@ public class CardsScreen extends RenderableView {
         if (!mLockUiUpdate) {
             mAdapter.notifyDataSetChanged();
         }
-        RecyclerViewv7DSL.recyclerView(() -> {
-            init(() -> {
-                ItemTouchHelper.Callback cb = new CardTouchHelperCallback();
-                ItemTouchHelper touchHelper = new ItemTouchHelper(cb);
-                touchHelper.attachToRecyclerView(Anvil.currentView());
-            });
-            RecyclerViewv7DSL.gridLayoutManager(2);
-            RecyclerViewv7DSL.hasFixedSize(false);
-            RecyclerViewv7DSL.itemAnimator(new DefaultItemAnimator());
-            RecyclerViewv7DSL.adapter(mAdapter);
-        });
-        if (hasFAB()) {
-            DesignDSL.floatingActionButton(() -> {
-                size(WRAP, WRAP);
-                margin(dip(32));
+        linearLayout(() -> {
+            orientation(LinearLayout.VERTICAL);
+
+            AppCompatv7DSL.toolbar(() -> {
+                init(() -> {
+                    ((AppCompatActivity) getContext()).setSupportActionBar(Anvil.currentView());
+                    ((AppCompatActivity) getContext()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    ((AppCompatActivity) getContext()).getSupportActionBar().setHomeButtonEnabled(true);
+                    ((AppCompatActivity) getContext()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+                    ((KumquatActivity) getContext()).drawerToggle().syncState();
+                });
+                size(FILL, dip(54));
+                backgroundColor(0xff2ecc71);
                 DesignDSL.compatElevation(dip(4));
-                layoutGravity(BOTTOM | END);
-                onClick(v -> {
-                    Intent intent = new Intent(getContext(), CardEditorActivity.class);
-                    v.getContext().startActivity(intent);
+                AppCompatv7DSL.navigationOnClickListener(v -> {
+                    System.out.println("navigationOnClick()");
+                    ((KumquatActivity) getContext()).drawer().openDrawer(GravityCompat.START);
+                });
+
+                textView(() -> {
+                    size(WRAP, WRAP);
+                    text("Cards");
+                    textSize(sip(20));
+                    layoutGravity(CENTER_VERTICAL);
+                    textColor(Color.WHITE);
                 });
             });
-        }
+
+            frameLayout(() -> {
+                size(FILL, 0);
+                weight(1);
+
+                RecyclerViewv7DSL.recyclerView(() -> {
+                    init(() -> {
+                        ItemTouchHelper.Callback cb = new CardTouchHelperCallback();
+                        ItemTouchHelper touchHelper = new ItemTouchHelper(cb);
+                        touchHelper.attachToRecyclerView(Anvil.currentView());
+                    });
+                    size(FILL, WRAP);
+                    RecyclerViewv7DSL.gridLayoutManager(2);
+                    RecyclerViewv7DSL.hasFixedSize(false);
+                    RecyclerViewv7DSL.itemAnimator(new DefaultItemAnimator());
+                    RecyclerViewv7DSL.adapter(mAdapter);
+                });
+
+                if (hasFAB()) {
+                    DesignDSL.floatingActionButton(() -> {
+                        size(WRAP, WRAP);
+                        margin(dip(24));
+                        layoutGravity(BOTTOM | END);
+                        imageResource(R.drawable.ic_add);
+                        DesignDSL.backgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{0xff27ae60}));
+                        DesignDSL.compatElevation(dip(4));
+                        onClick(v -> {
+                            Intent intent = new Intent(getContext(), CardEditorActivity.class);
+                            v.getContext().startActivity(intent);
+                        });
+                    });
+                }
+            });
+        });
     }
 
     private class CardAdapter extends RenderableRecyclerViewAdapter implements ActionMode.Callback {
