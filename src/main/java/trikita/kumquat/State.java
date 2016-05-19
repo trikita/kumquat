@@ -213,7 +213,7 @@ public abstract class State {
         for (String topic : topics) {
             list = list.append(ImmutableCard.builder()
                     .id(generateId())
-                    .name("")
+                    .name("Card "+topic)
                     .topic(topic)
                     .value("")
                     .connId("")
