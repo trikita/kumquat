@@ -82,6 +82,26 @@ public abstract class State {
         public abstract ConnectionStatus status();
     }
 
+    public enum CardType {
+        TEXT("Text label", R.drawable.ic_text_card, 0xff2ecc71, 0xff27ae60),
+        INPUTTEXT("Input text", R.drawable.ic_inputtext_card, 0xff3498db, 0xff2980b9),
+        BUTTON("Button", R.drawable.ic_button_card, 0xff9b59b6, 0xff8e44ad),
+        SWITCH("Switch", R.drawable.ic_switch_card, 0xffff5722, 0xffcb4b16),
+        SLIDEBAR("Slidebar", R.drawable.ic_slidebar_card, 0xffe74c3c, 0xffc0392b);
+
+        public final String title;
+        public final int iconResource;
+        public final int primaryColor;
+        public final int primaryDarkColor;
+
+        CardType(String title, int iconResource, int color, int darkColor) {
+            this.title = title;
+            this.iconResource = iconResource;
+            this.primaryColor = color;
+            this.primaryDarkColor = darkColor;
+        }
+    }
+
     @Value.Immutable
     @Gson.TypeAdapters
     public static abstract class Card {
@@ -193,6 +213,21 @@ public abstract class State {
 
     static String generateId() {
         return UUID.randomUUID().toString();
+    }
+
+    static CardType cardType(Card c) {
+        if (c.params() instanceof Card.TextCardParams) {
+            return CardType.TEXT;
+        } else if (c.params() instanceof Card.InputTextCardParams) {
+            return CardType.INPUTTEXT;
+        } else if (c.params() instanceof Card.ButtonCardParams) {
+            return CardType.BUTTON;
+        } else if (c.params() instanceof Card.SwitchCardParams) {
+            return CardType.SWITCH;
+        } else if (c.params() instanceof Card.SlidebarCardParams) {
+            return CardType.SLIDEBAR;
+        }
+        return null;
     }
 
     static class Reducer implements Store.Reducer<Action, State> {
