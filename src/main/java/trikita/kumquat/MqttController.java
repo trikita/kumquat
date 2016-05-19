@@ -95,13 +95,13 @@ public class MqttController implements Store.Middleware<Action, State> {
     }
 
     private void initClient(String id, MqttServer ms) {
-        MqttAndroidClient client = new MqttAndroidClient(mContext, ms.uri(), ms.clientId());
+        MqttAndroidClient client = new MqttAndroidClient(mContext, ms.host()+":"+ms.port(), ms.clientId());
         mClients.put(id, client);
         try {
             System.out.println("Start connecting to " + id + ". Status " + ms.status().toString());
             connect(id);
         } catch (MqttException e) {
-            Log.d(tag, "Failed to connect to "+ms.uri()+". Status " + ms.status().toString());
+            Log.d(tag, "Failed to connect to "+ms.host()+":"+ms.port()+". Status " + ms.status().toString());
             mClients.remove(id);
             e.printStackTrace();
         }

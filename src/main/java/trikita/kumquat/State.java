@@ -20,7 +20,9 @@ import trikita.jedux.Store;
 @Gson.TypeAdapters
 public abstract class State {
 
-    private final static String DEFAULT_SERVER = "tcp://192.168.57.1:1883";
+    private final static String DEFAULT_HOST = "tcp://example.com";
+    private final static String DEFAULT_PORT = "1883";
+    //private final static String DEFAULT_SERVER = "tcp://192.168.57.1:1883";
 
     public enum Navigation {
         CONNECTIONS(ConnectionsScreen.class, R.string.nav_connections),
@@ -54,7 +56,8 @@ public abstract class State {
     public static abstract class MqttServer {
         public abstract String id();
         public abstract String name();
-        public abstract String uri();
+        public abstract String host();
+        public abstract String port();
         public abstract String clientId();
         public abstract String username();
         public abstract String password();
