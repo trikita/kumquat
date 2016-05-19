@@ -2,6 +2,7 @@
 <resources>
 	<style name="Theme.App" parent="Theme.AppCompat.Light.NoActionBar">
 		<item name="windowActionModeOverlay">true</item>
+		<item name="colorPrimaryDark">#ff27ae60</item>
 	</style>
 </resources>
 
