@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +16,7 @@ import android.widget.RadioGroup;
 import static trikita.anvil.DSL.*;
 import trikita.anvil.Anvil;
 import trikita.anvil.RenderableAdapter;
+import trikita.anvil.RenderableView;
 import trikita.anvil.appcompat.v7.AppCompatv7DSL;
 import trikita.anvil.cardview.v7.CardViewv7DSL;
 import trikita.anvil.design.DesignDSL;
@@ -250,17 +252,134 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
                 textColor(0xff999999);
                 typeface("fonts/MaterialIcons-Regular.ttf");
                 gravity(CENTER);
+                onClick(v -> {
+                    createDialog();
+                });
             });
         });
     }
 
+    private CardType mSelectedCard;
+
+    private void createDialog() {
+        if (card.params() instanceof Card.TextCardParams) {
+            mSelectedCard = CardType.TEXT;
+        } else if (card.params() instanceof Card.InputTextCardParams) {
+            mSelectedCard = CardType.INPUTTEXT;
+        } else if (card.params() instanceof Card.ButtonCardParams) {
+            mSelectedCard = CardType.BUTTON;
+        } else if (card.params() instanceof Card.SwitchCardParams) {
+            mSelectedCard = CardType.SWITCH;
+        } else if (card.params() instanceof Card.SlidebarCardParams) {
+            mSelectedCard = CardType.SLIDEBAR;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+            .setTitle("Select card type")
+            .setCancelable(true)
+            .setView(new RenderableView(this) {
+                public void view() {
+                    linearLayout(() -> {
+                        size(FILL, WRAP);
+                        orientation(LinearLayout.VERTICAL);
+                        padding(dip(8));
+
+                        textView(() -> {
+                            size(FILL, WRAP);
+                            margin(dip(5));
+                            text("This action will discard card specific data");
+                            textColor(0xffe74c3c);
+                            typeface("fonts/Roboto-Light.ttf");
+                        });
+
+                        for (CardType t : CardType.values()) {
+                            cardType(t);
+                        }
+                    });
+                }
+            })
+            .setPositiveButton("Ok", (arg0, arg1) -> {
+                switch (mSelectedCard) {
+                    case TEXT:
+                        card = ImmutableCard.copyOf(card).withParams(ImmutableTextCardParams.builder().build());
+                        break;
+                    case INPUTTEXT:
+                        card = ImmutableCard.copyOf(card).withParams(ImmutableInputTextCardParams.builder().build());
+                        break;
+                    case BUTTON:
+                        card = ImmutableCard.copyOf(card)
+                                .withParams(ImmutableButtonCardParams.builder()
+                                    .payload("")
+                                    .build());
+                        break;
+                    case SWITCH:
+                        card = ImmutableCard.copyOf(card)
+                                .withParams(ImmutableSwitchCardParams.builder()
+                                    .onPayload("")
+                                    .offPayload("")
+                                    .build());
+                        break;
+                    case SLIDEBAR:
+                        card = ImmutableCard.copyOf(card)
+                                .withParams(ImmutableSlidebarCardParams.builder()
+                                    .min(0)
+                                    .max(0)
+                                    .step(0)
+                                    .build());
+                        break;
+                }
+                this.cardType = mSelectedCard;
+                App.dispatch(new Action<>(Actions.Card.MODIFY_TYPE, this.cardType));
+                Anvil.render();
+            })
+            .setNegativeButton("Cancel", (arg0, arg1) -> {});
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.show();
+    }
+
+    private void cardType(final CardType type) {
+        CardViewv7DSL.cardView(() -> {
+            size(FILL, WRAP);
+            margin(dip(4));
+            CardViewv7DSL.cardBackgroundColor(type.primaryColor);
+            onClick((v) -> {
+                mSelectedCard = type;
+            });
+
             linearLayout(() -> {
                 size(FILL, WRAP);
+                margin(dip(10));
+                gravity(CENTER_VERTICAL);
 
-                editText(() -> {
+                imageView(() -> {
+                    size(dip(32), dip(32));
+                    imageResource(type.iconResource);
+                    scaleType(ImageView.ScaleType.CENTER_INSIDE);
+                });
+
+                textView(() -> {
                     size(0, WRAP);
                     weight(1);
-                    text(card.topic());
+                    margin(dip(20), 0);
+                    text(type.title);
+                    textSize(sip(18));
+                    textColor(0xffffffff);
+                    typeface("fonts/Roboto-Light.ttf");
+                });
+
+                textView(() -> {
+                    size(WRAP, WRAP);
+                    text("\ue5ca");
+                    textSize(sip(24));
+                    textColor(0xffffffff);
+                    typeface("fonts/MaterialIcons-Regular.ttf");
+                    visibility(type == mSelectedCard);
+                });
+            });
+        });
+    }
+
     private void radiobutton(final int i) {
         AppCompatv7DSL.appCompatRadioButton(() -> {
             id(RADIOBUTTON_BASE_ID + i);
