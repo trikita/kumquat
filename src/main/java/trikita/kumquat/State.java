@@ -95,22 +95,22 @@ public abstract class State {
 
         @Gson.ExpectedSubtypes({
                 TextCardParams.class,
-                EditTextCardParams.class,
+                InputTextCardParams.class,
                 ButtonCardParams.class,
-                ToggleCardParams.class,
-                SliderCardParams.class
+                SwitchCardParams.class,
+                SlidebarCardParams.class
         })
         public interface CardParams {}
         @Value.Immutable public interface TextCardParams extends CardParams {}
-        @Value.Immutable public interface EditTextCardParams extends CardParams {}
+        @Value.Immutable public interface InputTextCardParams extends CardParams {}
         @Value.Immutable public interface ButtonCardParams extends CardParams {
             String payload();
         }
-        @Value.Immutable public interface ToggleCardParams extends CardParams {
+        @Value.Immutable public interface SwitchCardParams extends CardParams {
             String onPayload();
             String offPayload();
         }
-        @Value.Immutable public interface SliderCardParams extends CardParams {
+        @Value.Immutable public interface SlidebarCardParams extends CardParams {
             float min();
             float max();
             float step();
