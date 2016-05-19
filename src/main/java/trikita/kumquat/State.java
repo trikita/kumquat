@@ -36,6 +36,19 @@ public abstract class State {
             this.viewClass = viewClass;
             this.nameResource = nameResource;
         }
+
+        public static Navigation from(int navbarId) {
+            switch (navbarId) {
+                case R.id.nav_connections:
+                    return CONNECTIONS;
+                case R.id.nav_cards:
+                    return CARDS;
+                case R.id.nav_favourites:
+                    return FAVOURITES;
+                default:
+                    return CONNECTIONS;
+            }
+        }
     }
 
     public enum ConnectionStatus {
