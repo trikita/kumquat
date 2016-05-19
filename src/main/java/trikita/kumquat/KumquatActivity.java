@@ -1,22 +1,21 @@
 package trikita.kumquat;
 
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import java.util.Arrays;
-
-import trikita.anvil.Anvil;
-import trikita.anvil.RenderableAdapter;
-import trikita.anvil.RenderableView;
-import trikita.jedux.Action;
-
 import static trikita.anvil.DSL.*;
 import static trikita.anvil.support.v4.Supportv4DSL.*;
+import trikita.anvil.Anvil;
+import trikita.anvil.RenderableView;
+import trikita.anvil.design.DesignDSL;
+
+import trikita.jedux.Action;
 
 public class KumquatActivity extends AppCompatActivity {
 
@@ -25,8 +24,17 @@ public class KumquatActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         navigationScreen = new NavigationScreen(this);
         setContentView(navigationScreen);
+    }
+
+    public DrawerLayout drawer() {
+        return navigationScreen.getDrawer();
+    }
+
+    public ActionBarDrawerToggle drawerToggle() {
+        return navigationScreen.getDrawerToggle();
     }
 
     @Override
@@ -41,11 +49,17 @@ public class KumquatActivity extends AppCompatActivity {
         private DrawerLayout drawer;
         private ActionBarDrawerToggle drawerToggle;
 
-        private RenderableAdapter navAdapter = RenderableAdapter.withItems(Arrays.asList(State.Navigation.values()), this::navigationItemView);
-
         public NavigationScreen(AppCompatActivity activity) {
             super(activity);
             this.activity = activity;
+        }
+
+        public DrawerLayout getDrawer() {
+            return drawer;
+        }
+
+        public ActionBarDrawerToggle getDrawerToggle() {
+            return drawerToggle;
         }
 
         @Override
@@ -55,33 +69,34 @@ public class KumquatActivity extends AppCompatActivity {
                     drawer = Anvil.currentView();
                     drawerToggle = new ActionBarDrawerToggle(activity, drawer, R.string.drawer_open, R.string.drawer_close);
                     drawer.addDrawerListener(drawerToggle);
-                    activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    activity.getSupportActionBar().setHomeButtonEnabled(true);
+                    drawerToggle.setDrawerIndicatorEnabled(true);
                     drawerToggle.syncState();
                 });
                 size(FILL, FILL);
-                System.out.println("screen = " + App.state().screen().viewClass);
+                fitsSystemWindows(true);
+
                 v(App.state().screen().viewClass, () -> {
                     size(FILL, FILL);
                 });
-                listView(() -> {
-                    size(dip(240), FILL);
-                    layoutGravity(START);
-                    adapter(navAdapter);
-                    backgroundColor(Color.WHITE);
-                    onItemClick((av, v, pos, id) -> {
-                        drawer.closeDrawer(av);
-                        State.Navigation nav = State.Navigation.values()[pos];
+
+                DesignDSL.navigationView(() -> {
+                    init(() -> {
+                        NavigationView navbar = Anvil.currentView();
+                        navbar.inflateMenu(R.menu.drawer);
+                        // FIXME depend on the currently displayed screen
+                        navbar.setCheckedItem(R.id.nav_connections);
+                    });
+                    size(WRAP, FILL);
+                    layoutGravity(GravityCompat.START);
+                    fitsSystemWindows(true);
+                    DesignDSL.navigationItemSelectedListener(item -> {
+                        item.setChecked(true);
+                        State.Navigation nav = State.Navigation.from(item.getItemId());
                         post(() -> App.dispatch(new Action<>(Actions.Navigation.NAVIGATE, nav)));
+                        drawer.closeDrawers();
+                        return true;
                     });
                 });
-            });
-        }
-
-        private void navigationItemView(int index, State.Navigation item) {
-            textView(() -> {
-                size(FILL, dip(48));
-                text(item.nameResource);
             });
         }
 
