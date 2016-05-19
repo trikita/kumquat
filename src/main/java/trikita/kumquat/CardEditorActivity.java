@@ -155,7 +155,7 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
 
                         linearLayout(() -> {
                             orientation(LinearLayout.VERTICAL);
-                            margin(dip(5));
+                            margin(dip(5), dip(10), dip(5), dip(15));
 
                             DesignDSL.textInputLayout(() -> {
                                 DesignDSL.hintEnabled(true);
@@ -432,7 +432,7 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
             DesignDSL.textInputLayout(() -> {
                 DesignDSL.hintEnabled(true);
                 DesignDSL.hint("Payload");
-                margin(dip(5));
+                margin(dip(5), dip(10), dip(5), dip(15));
 
                 AppCompatv7DSL.appCompatEditText(() -> {
                     text(((Card.ButtonCardParams) card.params()).payload());
@@ -454,7 +454,7 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
 
             linearLayout(() -> {
                 orientation(LinearLayout.VERTICAL);
-                margin(dip(5));
+                margin(dip(5), dip(10), dip(5), dip(15));
 
                 DesignDSL.textInputLayout(() -> {
                     DesignDSL.hintEnabled(true);
@@ -495,7 +495,7 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
             margin(dip(8), dip(4));
 
             linearLayout(() -> {
-                margin(dip(5));
+                margin(dip(5), dip(10), dip(5), dip(15));
                 gravity(CENTER_VERTICAL);
 
                 DesignDSL.textInputLayout(() -> {
