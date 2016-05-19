@@ -11,11 +11,14 @@ public class App extends Application {
     private static App sInstance;
 
     private Store<Action, State> store;
+    private WindowController windowController;
 
     @Override
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+
+        this.windowController = new WindowController();
 
         PersistenceController persistenceController = new PersistenceController(this);
         State initialState = persistenceController.getSavedState();
@@ -24,7 +27,11 @@ public class App extends Application {
         }
         MqttController mqtt = new MqttController(this, initialState.connections());
 
-        this.store = new Store<>(new State.Reducer(), initialState, persistenceController, mqtt);
+        this.store = new Store<>(new State.Reducer(),
+                initialState,
+                this.windowController,
+                persistenceController,
+                mqtt);
 
         this.store.subscribe(Anvil::render);
     }
@@ -35,5 +42,9 @@ public class App extends Application {
 
     public static State dispatch(Action action) {
         return sInstance.store.dispatch(action);
+    }
+
+    public static WindowController getWindowController() {
+        return sInstance.windowController;
     }
 }
