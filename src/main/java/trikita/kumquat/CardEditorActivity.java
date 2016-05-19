@@ -1,5 +1,6 @@
 package trikita.kumquat;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -10,6 +11,8 @@ import android.widget.LinearLayout;
 import static trikita.anvil.DSL.*;
 import trikita.anvil.Anvil;
 import trikita.anvil.RenderableAdapter;
+import trikita.anvil.appcompat.v7.AppCompatv7DSL;
+import trikita.anvil.design.DesignDSL;
 
 import trikita.jedux.Action;
 
@@ -86,6 +89,26 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
     public void view() {
         linearLayout(() -> {
             orientation(LinearLayout.VERTICAL);
+
+            AppCompatv7DSL.toolbar(() -> {
+                init(() -> {
+                    setSupportActionBar(Anvil.currentView());
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    getSupportActionBar().setHomeButtonEnabled(true);
+                    getSupportActionBar().setDisplayShowTitleEnabled(false);
+                });
+                size(FILL, dip(54));
+                backgroundColor(cardType.primaryColor);
+                DesignDSL.compatElevation(dip(4));
+
+                textView(() -> {
+                    size(WRAP, WRAP);
+                    text(card.name());
+                    textSize(sip(20));
+                    layoutGravity(CENTER_VERTICAL);
+                    textColor(Color.WHITE);
+                });
+            });
 
             linearLayout(() -> {
                 size(FILL, WRAP);
