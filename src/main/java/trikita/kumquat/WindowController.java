@@ -21,8 +21,7 @@ public class WindowController implements Store.Middleware<Action, State> {
         }
         if (action.type instanceof Actions.Card && (Actions.Card) action.type == Actions.Card.MODIFY_TYPE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int color = State.cardType((State.Card) action.value).primaryDarkColor; 
-                mWindow.setStatusBarColor(color);
+                mWindow.setStatusBarColor(((State.CardType) action.value).primaryDarkColor);
                 return;
             }
         }

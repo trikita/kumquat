@@ -13,11 +13,14 @@ import trikita.anvil.RenderableAdapter;
 
 import trikita.jedux.Action;
 
+import trikita.kumquat.State.Card;
+import trikita.kumquat.State.CardType;
 import trikita.kumquat.State.MqttServer;
 
 public class CardEditorActivity extends AppCompatActivity implements Anvil.Renderable {
 
-    private State.Card card;
+    private Card card;
+    private CardType cardType;
     private boolean create = true;
 
     private RenderableAdapter mConnAdapter = RenderableAdapter
@@ -36,6 +39,8 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        App.getWindowController().setWindow(getWindow());
+
         String id = getIntent().getStringExtra("id");
         if (id != null) {
             this.card = ImmutableCard.copyOf(App.state().getCard(id));
@@ -51,7 +56,10 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
                     .params(ImmutableTextCardParams.builder().build())
                     .build();
         }
+        this.cardType = State.cardType(this.card);
         setContentView(Anvil.mount(new FrameLayout(this), this));
+
+        App.dispatch(new Action<>(Actions.Card.MODIFY_TYPE, cardType));
     }
 
     @Override
