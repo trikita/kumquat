@@ -20,14 +20,16 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
     private State.Card card;
     private boolean create = true;
 
-    private RenderableAdapter mServerAdapter = RenderableAdapter
+    private RenderableAdapter mConnAdapter = RenderableAdapter
         .withItems(App.state().connections().asList(), (index, item) -> {
             textView(() -> {
                 size(FILL, dip(50));
                 minWidth(dip(200));
-                padding(dip(7), 0);
+                padding(dip(5), 0);
                 gravity(LEFT|CENTER_VERTICAL);
-                text(item.uri());
+                text(item.name());
+                textSize(sip(18));
+                typeface("fonts/Roboto-Light.ttf");
             });
         });
 
