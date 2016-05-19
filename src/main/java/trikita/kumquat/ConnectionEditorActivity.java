@@ -1,5 +1,6 @@
 package trikita.kumquat;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -7,10 +8,12 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import trikita.anvil.Anvil;
-import trikita.jedux.Action;
-
 import static trikita.anvil.DSL.*;
+import trikita.anvil.Anvil;
+import trikita.anvil.appcompat.v7.AppCompatv7DSL;
+import trikita.anvil.design.DesignDSL;
+
+import trikita.jedux.Action;
 
 public class ConnectionEditorActivity extends AppCompatActivity implements Anvil.Renderable {
 
@@ -62,25 +65,33 @@ public class ConnectionEditorActivity extends AppCompatActivity implements Anvil
     @Override
     public void view() {
         linearLayout(() -> {
-            size(FILL, FILL);
             orientation(LinearLayout.VERTICAL);
 
-            editText(() -> {
-                text(conn.uri());
-                onTextChanged(s -> {
-                    conn = ImmutableMqttServer.copyOf(conn).withUri(s.toString());
+            AppCompatv7DSL.toolbar(() -> {
+                init(() -> {
+                    setSupportActionBar(Anvil.currentView());
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    getSupportActionBar().setHomeButtonEnabled(true);
+                    getSupportActionBar().setDisplayShowTitleEnabled(false);
+                });
+                size(FILL, dip(54));
+                backgroundColor(0xff2ecc71);
+                DesignDSL.compatElevation(dip(4));
+
+                textView(() -> {
+                    size(WRAP, WRAP);
+                    text(conn.name());
+                    textSize(sip(20));
+                    layoutGravity(CENTER_VERTICAL);
+                    textColor(Color.WHITE);
                 });
             });
 
-            button(() -> {
-                size(FILL, WRAP);
-                onClick(v -> {
-                    if (create) {
-                        App.dispatch(new Action<>(Actions.Connection.CREATE, conn));
-                    } else {
-                        App.dispatch(new Action<>(Actions.Connection.MODIFY, conn));
-                    }
-                    finish();
+            scrollView(() -> {
+                linearLayout(() -> {
+                    size(FILL, WRAP);
+                    orientation(LinearLayout.VERTICAL);
+                    margin(dip(8));
                 });
             });
         });
