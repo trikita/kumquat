@@ -100,6 +100,7 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
     public void view() {
         linearLayout(() -> {
             orientation(LinearLayout.VERTICAL);
+            backgroundColor(0xffeeeeee);
 
             AppCompatv7DSL.toolbar(() -> {
                 init(() -> {

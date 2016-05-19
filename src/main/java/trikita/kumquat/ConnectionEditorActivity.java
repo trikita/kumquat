@@ -76,6 +76,7 @@ public class ConnectionEditorActivity extends AppCompatActivity implements Anvil
     public void view() {
         linearLayout(() -> {
             orientation(LinearLayout.VERTICAL);
+            backgroundColor(0xffeeeeee);
 
             AppCompatv7DSL.toolbar(() -> {
                 init(() -> {
