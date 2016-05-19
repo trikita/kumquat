@@ -5,6 +5,6 @@
     <string name="drawer_close">close</string>
     <string name="nav_connections">Connections</string>
     <string name="nav_cards">Cards</string>
-    <string name="nav_favourites">Faviourites</string>
+    <string name="nav_favourites">Favourites</string>
     <string name="menu_remove">Remove</string>
 </resources>

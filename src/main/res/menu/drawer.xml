@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/grp_connections" android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_connections"
+            android:title="@string/nav_connections"
+            />
+    </group>
+    <group android:id="@+id/grp_cards" android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_cards"
+            android:title="@string/nav_cards"
+            />
+    </group>
+    <group android:id="@+id/grp_favourites" android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_favourites"
+            android:title="@string/nav_favourites"
+            />
+    </group>
+</menu>
