@@ -2,6 +2,8 @@ package trikita.kumquat;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -35,6 +37,26 @@ public class ConnectionEditorActivity extends AppCompatActivity implements Anvil
                     .build();
         }
         setContentView(Anvil.mount(new FrameLayout(this), this));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.item_editor, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.om_save) {
+            if (create) {
+                App.dispatch(new Action<>(Actions.Connection.CREATE, conn));
+            } else {
+                App.dispatch(new Action<>(Actions.Connection.MODIFY, conn));
+            }
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
