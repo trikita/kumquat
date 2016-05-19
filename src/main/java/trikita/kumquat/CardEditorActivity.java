@@ -64,7 +64,7 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
                     .value("")
                     .connId("")
                     .subQoS(0)
-                    .params(ImmutableTextCardParams.builder().build())
+                    .params(ImmutableTextCardParams.builder().dummy1(0).build())
                     .build();
         }
         this.cardType = State.cardType(this.card);
@@ -305,10 +305,16 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
             .setPositiveButton("Ok", (arg0, arg1) -> {
                 switch (mSelectedCard) {
                     case TEXT:
-                        card = ImmutableCard.copyOf(card).withParams(ImmutableTextCardParams.builder().build());
+                        card = ImmutableCard.copyOf(card)
+                                .withParams(ImmutableTextCardParams.builder()
+                                    .dummy1(0)
+                                    .build());
                         break;
                     case INPUTTEXT:
-                        card = ImmutableCard.copyOf(card).withParams(ImmutableInputTextCardParams.builder().build());
+                        card = ImmutableCard.copyOf(card)
+                                .withParams(ImmutableInputTextCardParams.builder()
+                                    .dummy2(0)
+                                    .build());
                         break;
                     case BUTTON:
                         card = ImmutableCard.copyOf(card)

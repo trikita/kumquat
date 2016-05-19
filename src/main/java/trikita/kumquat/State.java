@@ -121,8 +121,12 @@ public abstract class State {
                 SlidebarCardParams.class
         })
         public interface CardParams {}
-        @Value.Immutable public interface TextCardParams extends CardParams {}
-        @Value.Immutable public interface InputTextCardParams extends CardParams {}
+        @Value.Immutable public interface TextCardParams extends CardParams {
+            int dummy1();
+        }
+        @Value.Immutable public interface InputTextCardParams extends CardParams {
+            int dummy2();
+        }
         @Value.Immutable public interface ButtonCardParams extends CardParams {
             String payload();
         }
