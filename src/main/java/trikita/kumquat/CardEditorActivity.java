@@ -89,6 +89,9 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
             }
             finish();
             return true;
+        } else if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -104,6 +107,7 @@ public class CardEditorActivity extends AppCompatActivity implements Anvil.Rende
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                     getSupportActionBar().setHomeButtonEnabled(true);
                     getSupportActionBar().setDisplayShowTitleEnabled(false);
+                    getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
                 });
                 size(FILL, dip(54));
                 backgroundColor(cardType.primaryColor);

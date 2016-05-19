@@ -64,6 +64,9 @@ public class ConnectionEditorActivity extends AppCompatActivity implements Anvil
             }
             finish();
             return true;
+        } else if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -79,6 +82,7 @@ public class ConnectionEditorActivity extends AppCompatActivity implements Anvil
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                     getSupportActionBar().setHomeButtonEnabled(true);
                     getSupportActionBar().setDisplayShowTitleEnabled(false);
+                    getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
                 });
                 size(FILL, dip(54));
                 backgroundColor(0xff2ecc71);
